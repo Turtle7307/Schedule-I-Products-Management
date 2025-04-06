@@ -1,0 +1,17 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:semi="https://irihi.tech/semi"
+             x:Class="Schedule_I_Products_Management.App"
+             xmlns:local="using:Schedule_I_Products_Management"
+             RequestedThemeVariant="Default">
+             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+
+    <Application.DataTemplates>
+        <local:ViewLocator/>
+    </Application.DataTemplates>
+  
+    <Application.Styles>
+        <semi:SemiTheme Locale="de-DE"/>
+        <StyleInclude Source="avares://Semi.Avalonia.DataGrid/Index.axaml" />
+    </Application.Styles>
+</Application>

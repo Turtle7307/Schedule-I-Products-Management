@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AvaloniaProject">
+    <option name="projectPerEditor">
+      <map>
+        <entry key="Schedule I Products Management/App.axaml" value="Schedule I Products Management/Schedule I Products Management.csproj" />
+        <entry key="Schedule I Products Management/Views/MainWindow.axaml" value="Schedule I Products Management/Schedule I Products Management.csproj" />
+      </map>
+    </option>
+  </component>
+</project>
