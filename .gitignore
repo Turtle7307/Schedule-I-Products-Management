@@ -877,3 +877,5 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 
+# Release Builds
+Publish

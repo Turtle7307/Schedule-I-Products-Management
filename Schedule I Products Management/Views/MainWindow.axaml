@@ -65,7 +65,7 @@
     <TabControl>
         <!-- List Products -->
         <TabItem Header="Products Overview">
-            <Grid Margin="5" > <!-- TODO: Needs List of all products a list of the products Mixables and the -->
+            <Grid Margin="5" >
                 
             </Grid>
         </TabItem>
