@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Schedule_I_Products_Management.Data;
 
@@ -9,4 +10,5 @@ public class MixedProduct : IProduct
     public int AskingPrice { get; set; }
     public int Addictiveness { get; set; }
     public ProductCategory Category { get; set; }
+    public List<Guid> MixablesIds { get; set; } = new();
 }
