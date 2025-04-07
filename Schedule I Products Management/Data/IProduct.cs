@@ -8,5 +8,4 @@ public interface IProduct
     public string Name { get; set; }
     public int AskingPrice { get; set; }
     public int Addictiveness { get; set; }
-    public ProductCategory Category { get; set; }
 }

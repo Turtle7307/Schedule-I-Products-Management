@@ -3,18 +3,19 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using ReactiveUI;
 using Schedule_I_Products_Management.Data;
+using Schedule_I_Products_Management.Models;
 
 namespace Schedule_I_Products_Management.ViewModels;
 
 public class MainWindowViewModel : ViewModelBase
 {
 #pragma warning disable CA1822 // Mark members as static
-    private ObservableCollection<BaseProduct> _baseProducts = new();
-    private ObservableCollection<MixedProduct> _mixedProducts = new();
-    private ObservableCollection<Mixable> _mixables = new();
-    private MixedProduct? _edit_selectedMixedProduct;
+    private ObservableCollection<BaseProductWrapper> _baseProducts = new();
+    private ObservableCollection<MixedProductWrapper> _mixedProducts = new();
+    private ObservableCollection<MixableWrapper> _mixables = new();
+    private MixedProductWrapper? _edit_selectedMixedProduct;
     
-    public ObservableCollection<BaseProduct> BaseProducts
+    public ObservableCollection<BaseProductWrapper> BaseProducts
     {
         get => _baseProducts;
         set
@@ -23,7 +24,7 @@ public class MainWindowViewModel : ViewModelBase
         }
     }
     
-    public ObservableCollection<MixedProduct> MixedProducts
+    public ObservableCollection<MixedProductWrapper> MixedProducts
     {
         get => _mixedProducts;
         set
@@ -32,35 +33,44 @@ public class MainWindowViewModel : ViewModelBase
         }
     }
 
-    public ObservableCollection<Mixable> Mixables
+    public ObservableCollection<MixableWrapper> Mixables
     {
         get => _mixables;
         set
         {
             this.RaiseAndSetIfChanged(ref _mixables, value);
+            this.RaisePropertyChanged(nameof(EditSelectedMixedProductMixablesReverse));
         }
     }
 
-    public MixedProduct? EditSelectedMixedProduct
+    public MixedProductWrapper? EditSelectedMixedProduct
     {
         get => _edit_selectedMixedProduct;
         set
         {
             this.RaiseAndSetIfChanged(ref _edit_selectedMixedProduct, value);
             this.RaisePropertyChanged(nameof(EditSelectedMixedProductMixables));
+            this.RaisePropertyChanged(nameof(EditSelectedMixedProductMixablesReverse));
         }
     }
 
-    public List<Mixable> EditSelectedMixedProductMixables
+    public List<MixableWrapper> EditSelectedMixedProductMixables
     {
-        get => _edit_selectedMixedProduct.MixablesIds
+        get => _edit_selectedMixedProduct?.MixablesIds
             .Select(id => _mixables.FirstOrDefault(m => m.Id == id))
             .Where(m => m != null)
-            .ToList();
+            .ToList()!;
         set
         {
+            if (_edit_selectedMixedProduct == null)
+                return;
             _edit_selectedMixedProduct.MixablesIds = value.Select(m => m.Id).ToList();
         }
+    }
+    
+    public List<MixableWrapper> EditSelectedMixedProductMixablesReverse
+    {
+        get => _mixables.Where(mix => !(_edit_selectedMixedProduct?.MixablesIds.Any(m => m == mix.Id) ?? false)).ToList();
     }
 
 #pragma warning restore CA1822 // Mark members as static

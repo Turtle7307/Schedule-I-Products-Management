@@ -10,4 +10,9 @@ public class BaseProduct : IProduct, IBuyable
     public int AskingPrice { get; set; }
     public int Addictiveness { get; set; }
     public ProductCategory Category { get; set; }
+    
+    public override string ToString()
+    {
+        return Name;
+    }
 }

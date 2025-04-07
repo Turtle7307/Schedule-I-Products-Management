@@ -72,19 +72,19 @@
         
         <!-- Modify Products -->
         <TabItem Header="Products Management">
-            <Grid ColumnDefinitions="2*, *" RowDefinitions="Auto, *" Margin="5">
+            <Grid ColumnDefinitions="4*, *, *" RowDefinitions="Auto, *" Margin="5">
                 
                 <!-- Seed Products -->
                 <HeaderedContentControl Header="Buyable Plants" Margin="5">
                     <Grid ColumnDefinitions="2*, *">
                         <Border BorderThickness="1" CornerRadius="4" BorderBrush="{DynamicResource BorderCardBorderBrush}">
-                            <DataGrid ItemsSource="{Binding BaseProducts}" IsReadOnly="False">
+                            <DataGrid Name="dataGrid_edit_buyable" ItemsSource="{Binding BaseProducts}" IsReadOnly="False">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="Name" Binding="{Binding Name}"/>
                                     <DataGridTemplateColumn Header="Cost" SortMemberPath="Cost">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
-                                                <Label Content="{Binding Cost, StringFormat='{}$'}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                                <Label Content="{Binding Cost, StringFormat='{}{0}$'}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
                                         <DataGridTemplateColumn.CellEditingTemplate>
@@ -96,7 +96,7 @@
                                     <DataGridTemplateColumn Header="Asking Price" SortMemberPath="AskingPrice">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
-                                                <Label Content="{Binding AskingPrice, StringFormat='{}$'}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                                <Label Content="{Binding AskingPrice, StringFormat='{}{0}$'}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
                                         <DataGridTemplateColumn.CellEditingTemplate>
@@ -108,7 +108,7 @@
                                     <DataGridTemplateColumn Header="Addictiveness" SortMemberPath="Addictiveness">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
-                                                <Label Content="{Binding Addictiveness, StringFormat='{}%'}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                                <Label Content="{Binding Addictiveness, StringFormat='{}{0}%'}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
                                         <DataGridTemplateColumn.CellEditingTemplate>
@@ -120,7 +120,7 @@
                                     <DataGridTemplateColumn Header="Category">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
-                                                <Label Content="{Binding Category}"/>
+                                                <Label Content="{Binding Category}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
                                         <DataGridTemplateColumn.CellEditingTemplate>
@@ -138,37 +138,37 @@
                         </Border>
                         
                         <Grid Grid.Column="1" ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto, Auto" Margin="5">
-                            <Label Content="Name:" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5, 0"/>
-                            <TextBox Grid.Row="0" Grid.Column="1"/>
-                            <Label Grid.Row="1" Grid.Column="0" Content="Cost:" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5, 0"/>
-                            <NumericUpDown Grid.Row="1" Grid.Column="1" Minimum="0" Increment="1" Value="30"/>
-                            <Label Grid.Row="2" Grid.Column="0" Content="AskingPrice:" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5, 0"/>
-                            <NumericUpDown Grid.Row="2" Grid.Column="1" Value="35" Minimum="0" Increment="1"/>
-                            <Label Grid.Row="3" Grid.Column="0" Content="Addictiveness:" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5, 0"/>
-                            <NumericUpDown Grid.Row="3" Grid.Column="1" Value="0" Minimum="0" Maximum="100" Increment="1"/>
-                            <Label Grid.Row="4" Grid.Column="0" Content="Category:" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5, 0"/>
-                            <ComboBox Grid.Row="4" Grid.Column="1" SelectedIndex="0" HorizontalAlignment="Stretch">
+                            <Label Content="Name:" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5, 5"/>
+                            <TextBox Name="textBox_edit_buyable_name" Grid.Row="0" Grid.Column="1" Margin="0, 5"/>
+                            <Label Grid.Row="1" Grid.Column="0" Content="Cost:" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5, 5"/>
+                            <NumericUpDown Name="numericUpDown_edit_buyable_cost" Grid.Row="1" Grid.Column="1" Minimum="0" Increment="1" Value="30" Margin="0, 5"/>
+                            <Label Grid.Row="2" Grid.Column="0" Content="AskingPrice:" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5, 5"/>
+                            <NumericUpDown Name="numericUpDown_edit_buyable_askingPrice" Grid.Row="2" Grid.Column="1" Value="35" Minimum="0" Increment="1" Margin="0, 5"/>
+                            <Label Grid.Row="3" Grid.Column="0" Content="Addictiveness:" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5, 5"/>
+                            <NumericUpDown Name="numericUpDown_edit_buyable_addictiveness" Grid.Row="3" Grid.Column="1" Value="0" Minimum="0" Maximum="100" Increment="1" Margin="0, 5"/>
+                            <Label Grid.Row="4" Grid.Column="0" Content="Category:" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5, 5"/>
+                            <ComboBox Grid.Row="4" Name="comboBox_edit_buyable_category" Grid.Column="1" SelectedIndex="0" HorizontalAlignment="Stretch" Margin="0, 5">
                                 <dat:ProductCategory>Marijuana</dat:ProductCategory>
                                 <dat:ProductCategory>Methamphetamine</dat:ProductCategory>
                                 <dat:ProductCategory>Cocaine</dat:ProductCategory>
                             </ComboBox>
-                            <Button Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Content="Add new Buyable Plant" HorizontalAlignment="Center"/>
-                            <Button Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" Content="Delete selected" HorizontalAlignment="Center"/>
+                            <Button Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Content="Add new Buyable Plant" HorizontalAlignment="Center" Margin="0, 5" Click="Button_edit_buyable_add_OnClick"/>
+                            <Button Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" Content="Delete selected" HorizontalAlignment="Center" Margin="0, 5" Click="Button_edit_buyable_delete_OnClick"/>
                         </Grid>
                     </Grid>
                 </HeaderedContentControl>
                 
                 <!-- Mixable -->
-                <HeaderedContentControl Grid.Row="0" Grid.Column="2" Header="Mixables" Margin="5">
+                <HeaderedContentControl Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Header="Mixables" Margin="5">
                     <Grid ColumnDefinitions="*, *">
                         <Border BorderThickness="1" CornerRadius="4" BorderBrush="{DynamicResource BorderCardBorderBrush}">
-                            <DataGrid ItemsSource="{Binding Mixables}" IsReadOnly="False">
+                            <DataGrid Name="dataGrid_edit_mixable" ItemsSource="{Binding Mixables}" IsReadOnly="False">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="Name" Binding="{Binding Name}"/>
                                     <DataGridTemplateColumn Header="Cost" SortMemberPath="Cost">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
-                                                <Label Content="{Binding Cost, StringFormat='{}$'}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                                <Label Content="{Binding Cost, StringFormat='{}{0}$'}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
                                         <DataGridTemplateColumn.CellEditingTemplate>
@@ -182,12 +182,12 @@
                         </Border>
                         
                         <Grid Grid.Column="1" ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto, Auto, Auto" Margin="5">
-                            <Label Content="Name:" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5, 0"/>
-                            <TextBox Grid.Row="0" Grid.Column="1"/>
-                            <Label Grid.Row="1" Grid.Column="0" Content="Price:" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5, 0"/>
-                            <NumericUpDown Grid.Row="1" Grid.Column="1" Minimum="0" Increment="1" Value="3"/>
-                            <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Content="Add new Mixable" HorizontalAlignment="Center"/>
-                            <Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Content="Delete selected" HorizontalAlignment="Center"/>
+                            <Label Content="Name:" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5, 5"/>
+                            <TextBox Name="textBox_edit_mixable_name" Grid.Row="0" Grid.Column="1" Margin="0, 5"/>
+                            <Label Grid.Row="1" Grid.Column="0" Content="Price:" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5, 5"/>
+                            <NumericUpDown Name="numericUpDown_edit_mixable_price" Grid.Row="1" Grid.Column="1" Minimum="0" Increment="1" Value="3" Margin="0, 5"/>
+                            <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Content="Add new Mixable" HorizontalAlignment="Center" Margin="0, 5" Click="Button_edit_mixable_add_OnClick"/>
+                            <Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Content="Delete selected" HorizontalAlignment="Center" Margin="0, 5" Click="Button_edit_mixable_delete_OnClick"/>
                         </Grid>
                     </Grid>
                 </HeaderedContentControl>
@@ -195,66 +195,53 @@
                 <!-- Mixed Products & Ingredients -->
                 <HeaderedContentControl Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Header="Mixed Products" Margin="5">
                     <Grid ColumnDefinitions="2*, *">
-                        
-                        <!-- Mixed Products -->
-                        <Border BorderThickness="1" CornerRadius="4" BorderBrush="{DynamicResource BorderCardBorderBrush}">
-                            <DataGrid ItemsSource="{Binding MixedProducts}" SelectedItem="{Binding EditSelectedMixedProduct}" IsReadOnly="False">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Name" Binding="{Binding Name}"/>
-                                    <DataGridTemplateColumn Header="Asking Price" SortMemberPath="AskingPrice">
-                                        <DataGridTemplateColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <Label Content="{Binding AskingPrice, StringFormat='{}$'}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                            </DataTemplate>
-                                        </DataGridTemplateColumn.CellTemplate>
-                                        <DataGridTemplateColumn.CellEditingTemplate>
-                                            <DataTemplate>
-                                                <NumericUpDown Value="{Binding AskingPrice}" Minimum="0" Increment="1" HorizontalAlignment="Stretch"/>
-                                            </DataTemplate>
-                                        </DataGridTemplateColumn.CellEditingTemplate>
-                                    </DataGridTemplateColumn>
-                                    <DataGridTemplateColumn Header="Addictiveness" SortMemberPath="Addictiveness">
-                                        <DataGridTemplateColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <Label Content="{Binding Addictiveness, StringFormat='{}%'}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                            </DataTemplate>
-                                        </DataGridTemplateColumn.CellTemplate>
-                                        <DataGridTemplateColumn.CellEditingTemplate>
-                                            <DataTemplate>
-                                                <NumericUpDown Value="{Binding Addictiveness}" Minimum="0" Maximum="100" Increment="1" HorizontalAlignment="Stretch"/>
-                                            </DataTemplate>
-                                        </DataGridTemplateColumn.CellEditingTemplate>
-                                    </DataGridTemplateColumn>
-                                    <DataGridTemplateColumn Header="Category">
-                                        <DataGridTemplateColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <Label Content="{Binding Category}"/>
-                                            </DataTemplate>
-                                        </DataGridTemplateColumn.CellTemplate>
-                                        <DataGridTemplateColumn.CellEditingTemplate>
-                                            <DataTemplate>
-                                                <ComboBox SelectedIndex="{Binding Category}">
-                                                    <dat:ProductCategory>Marijuana</dat:ProductCategory>
-                                                    <dat:ProductCategory>Methamphetamine</dat:ProductCategory>
-                                                    <dat:ProductCategory>Cocaine</dat:ProductCategory>
-                                                </ComboBox>
-                                            </DataTemplate>
-                                        </DataGridTemplateColumn.CellEditingTemplate>
-                                    </DataGridTemplateColumn>
-                                </DataGrid.Columns>
-                            </DataGrid>
-                        </Border>
-                        
-                        <Grid Grid.Column="1" ColumnDefinitions="*, *" Margin="10, 0, 0, 0">
-                            <!-- Mixed Product Ingredients -->
-                            <Border BorderThickness="1" CornerRadius="4" BorderBrush="{DynamicResource BorderCardBorderBrush}">
-                                <DataGrid ItemsSource="{Binding EditSelectedMixedProductMixables}" IsReadOnly="True">
+                        <Grid ColumnDefinitions="2*, *" Margin="10, 0, 0, 0">
+                            
+                            <!-- Mixed Products -->
+                            <Border BorderThickness="1" CornerRadius="4" Margin="5, 0" BorderBrush="{DynamicResource BorderCardBorderBrush}">
+                                <DataGrid Name="dataGrid_edit_mixed" ItemsSource="{Binding MixedProducts}" SelectedItem="{Binding EditSelectedMixedProduct}" IsReadOnly="False">
                                     <DataGrid.Columns>
                                         <DataGridTextColumn Header="Name" Binding="{Binding Name}"/>
-                                        <DataGridTemplateColumn Header="Cost" SortMemberPath="Cost">
+                                        <DataGridTemplateColumn Header="Asking Price" SortMemberPath="AskingPrice">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
-                                                    <Label Content="{Binding Cost, StringFormat='{}$'}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                                    <Label Content="{Binding AskingPrice, StringFormat='{}{0}$'}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                            <DataGridTemplateColumn.CellEditingTemplate>
+                                                <DataTemplate>
+                                                    <NumericUpDown Value="{Binding AskingPrice}" Minimum="0" Increment="1" HorizontalAlignment="Stretch"/>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellEditingTemplate>
+                                        </DataGridTemplateColumn>
+                                        <DataGridTemplateColumn Header="Addictiveness" SortMemberPath="Addictiveness">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <Label Content="{Binding Addictiveness, StringFormat='{}{0}%'}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                            <DataGridTemplateColumn.CellEditingTemplate>
+                                                <DataTemplate>
+                                                    <NumericUpDown Value="{Binding Addictiveness}" Minimum="0" Maximum="100" Increment="1" HorizontalAlignment="Stretch"/>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellEditingTemplate>
+                                        </DataGridTemplateColumn>
+                                        <DataGridTemplateColumn Header="Base Product">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <Label Content="{Binding BaseProduct}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                            <DataGridTemplateColumn.CellEditingTemplate>
+                                                <DataTemplate>
+                                                    <ComboBox SelectedItem="{Binding BaseProduct}" ItemsSource="{Binding ((vm:MainWindowViewModel)DataContext).BaseProducts, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellEditingTemplate>
+                                        </DataGridTemplateColumn>
+                                        <DataGridTemplateColumn Header="Category" IsReadOnly="True">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <Label Content="{Binding BaseProduct.Category}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                                                 </DataTemplate>
                                             </DataGridTemplateColumn.CellTemplate>
                                         </DataGridTemplateColumn>
@@ -262,12 +249,52 @@
                                 </DataGrid>
                             </Border>
                             
-                            <Grid Grid.Column="1" ColumnDefinitions="*, *" RowDefinitions="Auto, Auto, Auto" Margin="10, 0,0, 0">
-                                
-                            </Grid>
+                            <!-- Mixed Product Ingredients -->
+                            <Border Grid.Column="1" BorderThickness="1" CornerRadius="4" Margin="5, 0" BorderBrush="{DynamicResource BorderCardBorderBrush}">
+                                <DataGrid Name="dataGrid_edit_ingredients" ItemsSource="{Binding EditSelectedMixedProductMixables}" IsReadOnly="True">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Name" Binding="{Binding Name}"/>
+                                        <DataGridTemplateColumn Header="Cost" SortMemberPath="Cost">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <Label Content="{Binding Cost, StringFormat='{}{0}$'}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </Border>
+                        </Grid>
+                        
+                        <Grid Grid.Column="1" ColumnDefinitions="*, *">
+                            <HeaderedContentControl Header="Product Controls" Margin="5, 0">
+                                <Grid ColumnDefinitions="*, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto">
+                                    <Label Content="Name:" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5, 5"/>
+                                    <TextBox Name="textBox_edit_mixed_name" Grid.Row="0" Grid.Column="1" Margin="0, 5"/>
+                                    <Label Grid.Row="1" Grid.Column="0" Content="AskingPrice:" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5, 5"/>
+                                    <NumericUpDown Name="numericUpDown_edit_mixed_askingPrice" Grid.Row="1" Grid.Column="1" Value="35" Minimum="0" Increment="1" Margin="0, 5"/>
+                                    <Label Grid.Row="2" Grid.Column="0" Content="Addictiveness:" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5, 5"/>
+                                    <NumericUpDown Name="numericUpDown_edit_mixed_addictiveness" Grid.Row="2" Grid.Column="1" Value="0" Minimum="0" Maximum="100" Increment="1" Margin="0, 5"/>
+                                    <Label Grid.Row="3" Grid.Column="0" Content="Base Product:" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5, 5"/>
+                                    <ComboBox Name="comboBox_edit_mixed_baseProduct" ItemsSource="{Binding BaseProducts}" Grid.Row="3" Grid.Column="1" SelectedIndex="0" HorizontalAlignment="Stretch" Margin="0, 5"/>
+                                    <Button Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Content="Add new Mixed Product" HorizontalAlignment="Center" Margin="0, 5" Click="Button_edit_mixed_add_OnClick"/>
+                                    <Button Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Content="Delete selected" HorizontalAlignment="Center" Margin="0, 5" Click="Button_edit_mixed_delete_OnClick"/>
+                                </Grid>
+                            </HeaderedContentControl>
+                            
+                            <HeaderedContentControl Grid.Column="1" Header="Mixables Controls" Margin="5, 0">
+                                <Grid ColumnDefinitions="*, *" RowDefinitions="Auto, Auto, Auto" Margin="5">
+                                    <Label Grid.Column="0" Content="Mixable:" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5, 5"/>
+                                    <ComboBox Name="comboBox_edit_ingredients_mixable" ItemsSource="{Binding EditSelectedMixedProductMixablesReverse}" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" Margin="0, 5"/>
+                                    <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Content="Add new Mixable to Product" HorizontalAlignment="Center" Margin="0, 5" Click="Button_edit_ingredients_add_OnClick"/>
+                                    <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Content="Delete selected" HorizontalAlignment="Center" Margin="0, 5" Click="Button_edit_ingredients_delete_OnClick"/>
+                                </Grid>
+                            </HeaderedContentControl>
                         </Grid>
                     </Grid>
                 </HeaderedContentControl>
+                
+                <Button Grid.Row="1" Grid.Column="2" Content="Save Data" VerticalAlignment="Bottom" Margin="10" Classes="Success" Click="Button_save_OnClick"/>
             </Grid>
         </TabItem>
     </TabControl>
