@@ -1,12 +1,15 @@
 using System;
+using System.Collections.Generic;
 using ReactiveUI;
 using Schedule_I_Products_Management.Data;
 
 namespace Schedule_I_Products_Management.Models;
 
-public class BaseProductWrapper(BaseProduct baseProduct) : ReactiveObject
+public class BaseProductWrapper(BaseProduct baseProduct) : ReactiveObject, IProductWrapperShowData
 {
     private BaseProduct _baseProduct = baseProduct;
+    public bool IsMixed => false;
+    public List<MixableWrapper> Mixables => [];
 
     public Guid Id
     {

@@ -2,7 +2,6 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using ReactiveUI;
-using Schedule_I_Products_Management.Data;
 using Schedule_I_Products_Management.Models;
 
 namespace Schedule_I_Products_Management.ViewModels;
@@ -21,6 +20,7 @@ public class MainWindowViewModel : ViewModelBase
         set
         {
             this.RaiseAndSetIfChanged(ref _baseProducts, value);
+            this.RaisePropertyChanged(nameof(OverviewFilteredProducts));
         }
     }
     
@@ -30,6 +30,7 @@ public class MainWindowViewModel : ViewModelBase
         set
         {
             this.RaiseAndSetIfChanged(ref _mixedProducts, value);
+            this.RaisePropertyChanged(nameof(OverviewFilteredProducts));
         }
     }
 
@@ -71,6 +72,16 @@ public class MainWindowViewModel : ViewModelBase
     public List<MixableWrapper> EditSelectedMixedProductMixablesReverse
     {
         get => _mixables.Where(mix => !(_edit_selectedMixedProduct?.MixablesIds.Any(m => m == mix.Id) ?? false)).ToList();
+    }
+
+    public List<IProductWrapperShowData> OverviewFilteredProducts
+    {
+        get
+        {
+            var products = _baseProducts.Select(IProductWrapperShowData (bp) => bp).ToList();
+            products.AddRange(_mixedProducts.Select(IProductWrapperShowData (bp) => bp).ToList());
+            return products;
+        }
     }
 
 #pragma warning restore CA1822 // Mark members as static

@@ -7,10 +7,17 @@ using Schedule_I_Products_Management.Views;
 
 namespace Schedule_I_Products_Management.Models;
 
-public class MixedProductWrapper(MixedProduct mixedProduct) : ReactiveObject
+public class MixedProductWrapper(MixedProduct mixedProduct) : ReactiveObject, IProductWrapperShowData
 {
     private MixedProduct _mixedProduct = mixedProduct;
-    
+    public ProductCategory Category => BaseProduct.Category;
+    public bool IsMixed => true;
+    public int Cost => BaseProduct.Cost + MainWindow.ViewModel.Mixables
+                           .Where(m => MixablesIds.Contains(m.Id))
+                           .Sum(m => m.Cost);
+    public List<MixableWrapper> Mixables =>
+        MainWindow.ViewModel.Mixables.Where(m => MixablesIds.Contains(m.Id)).ToList();
+
     public Guid Id
     {
         get => _mixedProduct.Id;

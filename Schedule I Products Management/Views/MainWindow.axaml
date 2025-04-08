@@ -2,6 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:Schedule_I_Products_Management.ViewModels"
         xmlns:dat="using:Schedule_I_Products_Management.Data"
+        xmlns:m="using:Schedule_I_Products_Management.Models"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
@@ -65,8 +66,39 @@
     <TabControl>
         <!-- List Products -->
         <TabItem Header="Products Overview">
-            <Grid Margin="5" >
+            <Grid Margin="5" RowDefinitions="*, *">
                 
+                
+                <!--  -->
+                <HeaderedContentControl Grid.Row="1" Header="Registered Products" Margin="5">
+                    <Grid Margin="5" ColumnDefinitions="*, *">
+                        <Border BorderThickness="1" CornerRadius="4" BorderBrush="{DynamicResource BorderCardBorderBrush}">
+                            <DataGrid Name="dataGrid_overview_filter" IsReadOnly="True" SelectionMode="Single" ItemsSource="{Binding OverviewFilteredProducts}">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Name" Binding="{Binding Name}"/>
+                                    <DataGridTextColumn Header="Cost" Binding="{Binding Cost, StringFormat='{}{0}$'}"/>
+                                    <DataGridTextColumn Header="Asking Price" Binding="{Binding AskingPrice, StringFormat='{}{0}$'}"/>
+                                    <DataGridTextColumn Header="Addictiveness" Binding="{Binding Addictiveness, StringFormat='{}{0}%'}"/>
+                                    <DataGridTextColumn Header="Category" Binding="{Binding Category}"/>
+                                    <DataGridCheckBoxColumn Header="Is mixed product" Binding="{Binding IsMixed}"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Border>
+                        
+                        <Grid Grid.Column="1" ColumnDefinitions="*, *">
+                            <Border BorderThickness="1" CornerRadius="4" BorderBrush="{DynamicResource BorderCardBorderBrush}">
+                                <DataGrid IsReadOnly="True" ItemsSource="{Binding ((m:IProductWrapperShowData)SelectedItem).Mixables, ElementName=dataGrid_overview_filter}">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Name" Binding="{Binding Name}"/>
+                                        <DataGridTextColumn Header="Cost" Binding="{Binding Cost, StringFormat='{}{0}$'}"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </Border>
+                            
+                            
+                        </Grid>
+                    </Grid>
+                </HeaderedContentControl>
             </Grid>
         </TabItem>
         
@@ -84,7 +116,7 @@
                                     <DataGridTemplateColumn Header="Cost" SortMemberPath="Cost">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
-                                                <Label Content="{Binding Cost, StringFormat='{}{0}$'}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                                <Label Content="{Binding Cost, StringFormat='{}{0}$'}" VerticalAlignment="Center" Margin="10, 0"/>
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
                                         <DataGridTemplateColumn.CellEditingTemplate>
@@ -96,7 +128,7 @@
                                     <DataGridTemplateColumn Header="Asking Price" SortMemberPath="AskingPrice">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
-                                                <Label Content="{Binding AskingPrice, StringFormat='{}{0}$'}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                                <Label Content="{Binding AskingPrice, StringFormat='{}{0}$'}" VerticalAlignment="Center" Margin="10, 0"/>
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
                                         <DataGridTemplateColumn.CellEditingTemplate>
@@ -108,7 +140,7 @@
                                     <DataGridTemplateColumn Header="Addictiveness" SortMemberPath="Addictiveness">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
-                                                <Label Content="{Binding Addictiveness, StringFormat='{}{0}%'}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                                <Label Content="{Binding Addictiveness, StringFormat='{}{0}%'}" VerticalAlignment="Center" Margin="10, 0"/>
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
                                         <DataGridTemplateColumn.CellEditingTemplate>
@@ -120,7 +152,7 @@
                                     <DataGridTemplateColumn Header="Category">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
-                                                <Label Content="{Binding Category}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                                <Label Content="{Binding Category}" VerticalAlignment="Center" Margin="10, 0"/>
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
                                         <DataGridTemplateColumn.CellEditingTemplate>
@@ -168,7 +200,7 @@
                                     <DataGridTemplateColumn Header="Cost" SortMemberPath="Cost">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
-                                                <Label Content="{Binding Cost, StringFormat='{}{0}$'}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                                <Label Content="{Binding Cost, StringFormat='{}{0}$'}" VerticalAlignment="Center" Margin="10, 0"/>
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
                                         <DataGridTemplateColumn.CellEditingTemplate>
@@ -205,7 +237,7 @@
                                         <DataGridTemplateColumn Header="Asking Price" SortMemberPath="AskingPrice">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
-                                                    <Label Content="{Binding AskingPrice, StringFormat='{}{0}$'}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                                    <Label Content="{Binding AskingPrice, StringFormat='{}{0}$'}" VerticalAlignment="Center" Margin="10, 0"/>
                                                 </DataTemplate>
                                             </DataGridTemplateColumn.CellTemplate>
                                             <DataGridTemplateColumn.CellEditingTemplate>
@@ -217,7 +249,7 @@
                                         <DataGridTemplateColumn Header="Addictiveness" SortMemberPath="Addictiveness">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
-                                                    <Label Content="{Binding Addictiveness, StringFormat='{}{0}%'}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                                    <Label Content="{Binding Addictiveness, StringFormat='{}{0}%'}" VerticalAlignment="Center" Margin="10, 0"/>
                                                 </DataTemplate>
                                             </DataGridTemplateColumn.CellTemplate>
                                             <DataGridTemplateColumn.CellEditingTemplate>
@@ -229,7 +261,7 @@
                                         <DataGridTemplateColumn Header="Base Product">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
-                                                    <Label Content="{Binding BaseProduct}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                                    <Label Content="{Binding BaseProduct}" VerticalAlignment="Center" Margin="10, 0"/>
                                                 </DataTemplate>
                                             </DataGridTemplateColumn.CellTemplate>
                                             <DataGridTemplateColumn.CellEditingTemplate>
@@ -241,7 +273,7 @@
                                         <DataGridTemplateColumn Header="Category" IsReadOnly="True">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
-                                                    <Label Content="{Binding BaseProduct.Category}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                                    <Label Content="{Binding BaseProduct.Category}" VerticalAlignment="Center" Margin="10, 0"/>
                                                 </DataTemplate>
                                             </DataGridTemplateColumn.CellTemplate>
                                         </DataGridTemplateColumn>
@@ -257,7 +289,7 @@
                                         <DataGridTemplateColumn Header="Cost" SortMemberPath="Cost">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
-                                                    <Label Content="{Binding Cost, StringFormat='{}{0}$'}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                                    <Label Content="{Binding Cost, StringFormat='{}{0}$'}" VerticalAlignment="Center" Margin="10, 0"/>
                                                 </DataTemplate>
                                             </DataGridTemplateColumn.CellTemplate>
                                         </DataGridTemplateColumn>
