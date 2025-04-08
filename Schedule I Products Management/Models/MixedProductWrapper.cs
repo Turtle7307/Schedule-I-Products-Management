@@ -7,9 +7,18 @@ using Schedule_I_Products_Management.Views;
 
 namespace Schedule_I_Products_Management.Models;
 
-public class MixedProductWrapper(MixedProduct mixedProduct) : ReactiveObject, IProductWrapperShowData
+public class MixedProductWrapper : ReactiveObject, IProductWrapperShowData
 {
-    private MixedProduct _mixedProduct = mixedProduct;
+    private MixedProduct _mixedProduct;
+
+    public MixedProductWrapper(MixedProduct mixedProduct)
+    {
+        _mixedProduct = mixedProduct;
+        foreach(var mixable in MainWindow.ViewModel.Mixables)
+            mixable.WhenAnyValue(x => x.Cost)
+                .ToProperty(this, x => x.Cost);
+    }
+
     public ProductCategory Category => BaseProduct.Category;
     public bool IsMixed => true;
     public int Cost => BaseProduct.Cost + MainWindow.ViewModel.Mixables

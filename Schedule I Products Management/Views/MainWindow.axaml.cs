@@ -144,6 +144,8 @@ public partial class MainWindow : Window
             return;
         
         ViewModel.EditSelectedMixedProduct.MixablesIds.Add(mixable.Id);
+        ViewModel.EditSelectedMixedProduct.RaisePropertyChanged(nameof(ViewModel.EditSelectedMixedProduct.Cost));
+        ViewModel.EditSelectedMixedProduct.RaisePropertyChanged(nameof(ViewModel.EditSelectedMixedProduct.Mixables));
         ViewModel.RaisePropertyChanged(nameof(ViewModel.EditSelectedMixedProductMixables));
         ViewModel.RaisePropertyChanged(nameof(ViewModel.EditSelectedMixedProductMixablesReverse));
     }
@@ -153,11 +155,13 @@ public partial class MainWindow : Window
         if (dataGrid_edit_ingredients.SelectedItems.Count == 0 || ViewModel.EditSelectedMixedProduct == null)
             return;
         
-        var selected = dataGrid_edit_mixed.SelectedItems.Cast<MixableWrapper>().ToList();
+        var selected = dataGrid_edit_ingredients.SelectedItems.Cast<MixableWrapper>().ToList();
         
         ViewModel.EditSelectedMixedProduct.MixablesIds = ViewModel.EditSelectedMixedProduct.MixablesIds
             .Where(mix => selected.All(smix => smix.Id != mix))
             .ToList();
+        ViewModel.EditSelectedMixedProduct.RaisePropertyChanged(nameof(ViewModel.EditSelectedMixedProduct.Cost));
+        ViewModel.EditSelectedMixedProduct.RaisePropertyChanged(nameof(ViewModel.EditSelectedMixedProduct.Mixables));
         ViewModel.RaisePropertyChanged(nameof(ViewModel.EditSelectedMixedProductMixables));
         ViewModel.RaisePropertyChanged(nameof(ViewModel.EditSelectedMixedProductMixablesReverse));
     }

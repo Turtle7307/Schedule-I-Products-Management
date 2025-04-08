@@ -76,7 +76,7 @@
                             <DataGrid Name="dataGrid_overview_filter" IsReadOnly="True" SelectionMode="Single" ItemsSource="{Binding OverviewFilteredProducts}">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="Name" Binding="{Binding Name}"/>
-                                    <DataGridTextColumn Header="Cost" Binding="{Binding Cost, StringFormat='{}{0}$'}"/>
+                                    <DataGridTextColumn Header="Total Cost" Binding="{Binding Cost, StringFormat='{}{0}$'}"/>
                                     <DataGridTextColumn Header="Asking Price" Binding="{Binding AskingPrice, StringFormat='{}{0}$'}"/>
                                     <DataGridTextColumn Header="Addictiveness" Binding="{Binding Addictiveness, StringFormat='{}{0}%'}"/>
                                     <DataGridTextColumn Header="Category" Binding="{Binding Category}"/>
