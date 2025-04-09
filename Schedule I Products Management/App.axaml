@@ -3,7 +3,7 @@
              xmlns:semi="https://irihi.tech/semi"
              x:Class="Schedule_I_Products_Management.App"
              xmlns:local="using:Schedule_I_Products_Management"
-             RequestedThemeVariant="Default">
+             RequestedThemeVariant="Dark">
              <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
     <Application.DataTemplates>

@@ -1,22 +1,41 @@
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Reactive.Linq;
 using ReactiveUI;
 using Schedule_I_Products_Management.Data;
+using Schedule_I_Products_Management.Views;
 
 namespace Schedule_I_Products_Management.Models;
 
-public class BaseProductWrapper(BaseProduct baseProduct) : ReactiveObject, IProductWrapperShowData
+public class BaseProductWrapper : ReactiveObject, IProductWrapperShowData
 {
-    private BaseProduct _baseProduct = baseProduct;
-    public bool IsMixed => false;
-    public ReadOnlyObservableCollection<MixableWrapper> Mixables => new([]);
+    private BaseProduct _baseProduct;
+    
+    private readonly ObservableAsPropertyHelper<int> _profit;
 
-    public Guid Id
+    public BaseProductWrapper(BaseProduct baseProduct)
     {
-        get => _baseProduct.Id;
+        _baseProduct = baseProduct;
+        
+        _profit = this.WhenAnyValue(x => x.Cost, x => x.AskingPrice)
+            .StartWith((Cost, AskingPrice))
+            .Select(tuple => tuple.Item2 - tuple.Item1)
+            .ToProperty(this, x => x.AskingPrice);
+    }
+
+    public bool IsMixed => false;
+    public int Profit => _profit.Value;
+    public ReadOnlyObservableCollection<MixableWrapper> Mixables => new([]);
+    public Guid Id => _baseProduct.Id;
+
+    public ProductEffectWrapper ProductEffect
+    {
+        get => MainWindow.ViewModel.ProductEffects.Items.FirstOrDefault(mix => mix.Id == _baseProduct.EffectId,
+            new ProductEffectWrapper(new ProductEffect { Name = "None" }));
         set
         {
-            _baseProduct.Id = value;
+            _baseProduct.EffectId = value.Id;
             this.RaisePropertyChanged();
         }
     }

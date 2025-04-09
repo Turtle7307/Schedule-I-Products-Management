@@ -12,16 +12,24 @@ namespace Schedule_I_Products_Management.Models;
 public class MixedProductWrapper : ReactiveObject, IProductWrapperShowData
 {
     private MixedProduct _mixedProduct;
+    private SourceList<Guid> _mixablesIds = new();
+    private SourceList<Guid> _effectIds = new();
     
     private readonly ObservableAsPropertyHelper<int> _cost;
+    private int _profit;
     private ReadOnlyObservableCollection<MixableWrapper> _mixables;
+    private ReadOnlyObservableCollection<ProductEffectWrapper> _effects;
 
     public MixedProductWrapper(MixedProduct mixedProduct)
     {
         _mixedProduct = mixedProduct;
+        _mixablesIds.AddRange(mixedProduct.MixablesIds);
+        _effectIds.AddRange(mixedProduct.EffectIds);
 
+        // Cost
         _cost = Observable.CombineLatest(
                 MainWindow.ViewModel.Mixables.Connect()
+                    .AutoRefresh()
                     .ToCollection()
                     .StartWith(MainWindow.ViewModel.Mixables.Items.ToList()),
                 MixablesIds.Connect()
@@ -34,6 +42,7 @@ public class MixedProductWrapper : ReactiveObject, IProductWrapperShowData
             )
             .ToProperty(this, x => x.Cost, out _cost);
         
+        // Mixables
         this.WhenAnyValue(x => x.MixablesIds)
             .Select(_ =>
                 MainWindow.ViewModel.Mixables
@@ -43,22 +52,37 @@ public class MixedProductWrapper : ReactiveObject, IProductWrapperShowData
                     .AsObservableList())
             .Switch()
             .Subscribe();
+        
+        // Effects
+        this.WhenAnyValue(x => x.EffectIds)
+            .Select(_ =>
+                MainWindow.ViewModel.ProductEffects
+                    .Connect()
+                    .Filter(m => EffectIds.Items.Contains(m.Id))
+                    .Bind(out _effects)
+                    .AsObservableList())
+            .Switch()
+            .Subscribe();
+        
+        // Profit
+        this.WhenAnyValue(x => x.Cost, x => x.AskingPrice)
+            .StartWith((Cost, AskingPrice))
+            .Select(tuple => tuple.Item2 - tuple.Item1)
+            .ObserveOn(RxApp.MainThreadScheduler)
+            .Subscribe(i =>
+            {
+                _profit = i;
+                this.RaisePropertyChanged(nameof(Profit));
+            });
     }
 
     public ProductCategory Category => BaseProduct.Category;
     public bool IsMixed => true;
     public int Cost => _cost.Value;
+    public int Profit => _profit;
     public ReadOnlyObservableCollection<MixableWrapper> Mixables => _mixables;
-
-    public Guid Id
-    {
-        get => _mixedProduct.Id;
-        set
-        {
-            _mixedProduct.Id = value;
-            this.RaisePropertyChanged();
-        }
-    }
+    public ReadOnlyObservableCollection<ProductEffectWrapper> Effects => _effects;
+    public Guid Id => _mixedProduct.Id;
 
     public BaseProductWrapper BaseProduct
     {
@@ -100,18 +124,33 @@ public class MixedProductWrapper : ReactiveObject, IProductWrapperShowData
         }
     }
 
-    public SourceList<Guid> MixablesIds
+    public SourceList<Guid> EffectIds
     {
-        get => _mixedProduct.MixablesIds;
+        get => _effectIds;
         set
         {
-            _mixedProduct.MixablesIds = value;
+            _effectIds = value;
+            this.RaisePropertyChanged();
+        }
+    }
+
+    public SourceList<Guid> MixablesIds
+    {
+        get => _mixablesIds;
+        set
+        {
+            _mixablesIds = value;
             this.RaisePropertyChanged();
         }
     }
 
     public static implicit operator MixedProductWrapper(MixedProduct mixedProduct) => new (mixedProduct);
-    public static implicit operator MixedProduct(MixedProductWrapper mixedProductWrapper) => mixedProductWrapper._mixedProduct;
+    public static implicit operator MixedProduct(MixedProductWrapper mixedProductWrapper)
+    {
+        mixedProductWrapper._mixedProduct.MixablesIds = mixedProductWrapper._mixablesIds.Items.ToList();
+        mixedProductWrapper._mixedProduct.EffectIds = mixedProductWrapper._effectIds.Items.ToList();
+        return mixedProductWrapper._mixedProduct;
+    }
 
     public override string ToString()
     {

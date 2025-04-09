@@ -15,6 +15,7 @@ public partial class MainWindow : Window
     private const string BaseProductsJsonFile = "baseProducts.json";
     private const string MixablesJsonFile = "mixablesProducts.json";
     private const string MixedProductsJsonFile = "mixedProducts.json";
+    private const string ProductEffectsJsonFile = "productEffects.json";
     
     public static MainWindowViewModel ViewModel { get; private set; }
 
@@ -28,14 +29,18 @@ public partial class MainWindow : Window
         ViewModel = (MainWindowViewModel) DataContext;
         if (!File.Exists(DataZipFile)) return;
 
-        ViewModel.BaseProducts.Edit(list =>
+        ViewModel.ProductEffects.Edit(list =>
             list.AddRange(
-                ZipHandler.ReadJsonFromZip<BaseProduct[]>(DataZipFile, BaseProductsJsonFile)!.
-                    Select(x => new BaseProductWrapper(x))));
+                ZipHandler.ReadJsonFromZip<ProductEffect[]>(DataZipFile, ProductEffectsJsonFile)!
+                    .Select(x => new ProductEffectWrapper(x))));
         ViewModel.Mixables.Edit(list =>
             list.AddRange(
                 ZipHandler.ReadJsonFromZip<Mixable[]>(DataZipFile, MixablesJsonFile)!
                     .Select(x => new MixableWrapper(x))));
+        ViewModel.BaseProducts.Edit(list =>
+            list.AddRange(
+                ZipHandler.ReadJsonFromZip<BaseProduct[]>(DataZipFile, BaseProductsJsonFile)!.
+                    Select(x => new BaseProductWrapper(x))));
         ViewModel.MixedProducts.Edit(list =>
             list.AddRange(
                 ZipHandler.ReadJsonFromZip<MixedProduct[]>(DataZipFile, MixedProductsJsonFile)!
@@ -44,17 +49,20 @@ public partial class MainWindow : Window
     
     private void Button_save_OnClick(object? sender, RoutedEventArgs e)
     {
-        ZipHandler.WriteJsonToZip(ViewModel.BaseProducts.Items.Select(BaseProduct (x) => x).ToArray(), DataZipFile,
-            BaseProductsJsonFile);
+        ZipHandler.WriteJsonToZip(ViewModel.ProductEffects.Items.Select(ProductEffect (x) => x).ToArray(), DataZipFile,
+            ProductEffectsJsonFile);
         ZipHandler.WriteJsonToZip(ViewModel.Mixables.Items.Select(Mixable (x) => x).ToArray(), DataZipFile,
             MixablesJsonFile);
+        ZipHandler.WriteJsonToZip(ViewModel.BaseProducts.Items.Select(BaseProduct (x) => x).ToArray(), DataZipFile,
+            BaseProductsJsonFile);
         ZipHandler.WriteJsonToZip(ViewModel.MixedProducts.Items.Select(MixedProduct (x) => x).ToArray(), DataZipFile,
             MixedProductsJsonFile);
     }
 
     private void Button_edit_buyable_add_OnClick(object? sender, RoutedEventArgs e)
     {
-        if (string.IsNullOrWhiteSpace(textBox_edit_buyable_name.Text))
+        if (string.IsNullOrWhiteSpace(textBox_edit_buyable_name.Text) ||
+            comboBox_edit_buyable_effect.SelectedItem is not ProductEffectWrapper)
             return;
         ViewModel.BaseProducts.Add(new BaseProduct
         {
@@ -62,6 +70,7 @@ public partial class MainWindow : Window
             Cost = (int) numericUpDown_edit_buyable_cost.Value!,
             AskingPrice = (int) numericUpDown_edit_buyable_askingPrice.Value!,
             Addictiveness = (int) numericUpDown_edit_buyable_addictiveness.Value!,
+            EffectId = ((ProductEffectWrapper) comboBox_edit_buyable_effect.SelectedItem!).Id,
             Category = (ProductCategory) comboBox_edit_buyable_category.SelectionBoxItem!
         });
     }
@@ -105,17 +114,68 @@ public partial class MainWindow : Window
         ViewModel.Mixables.Edit(list => list.RemoveMany(selected));
     }
 
+    private void Button_edit_effect_add_OnClick(object? sender, RoutedEventArgs e)
+    {
+        if (string.IsNullOrWhiteSpace(textBox_edit_effect_name.Text))
+            return;
+        
+        ViewModel.ProductEffects.Add(new ProductEffect
+        {
+            Name = textBox_edit_effect_name.Text
+        });
+    }
+    
+    private void Button_edit_effect_delete_OnClick(object? sender, RoutedEventArgs e)
+    {
+        if (dataGrid_edit_effect.SelectedItems.Count == 0)
+            return;
+
+        var selected = dataGrid_edit_effect.SelectedItems.Cast<ProductEffectWrapper>().ToList();
+        
+        //clean all mixedProducts of the deleted effects
+        foreach (var mixedProduct in ViewModel.MixedProducts.Items.Where(x =>
+                     x.EffectIds.Items.Any(id => selected.Select(sx => sx.Id).Contains(id))))
+            foreach (var wrapper in selected.Where(wrapper => mixedProduct.EffectIds.Items.Contains(wrapper.Id)))
+                mixedProduct.EffectIds.Remove(wrapper.Id);
+        
+        ViewModel.ProductEffects.Edit(list => list.RemoveMany(selected));
+    }
+
     private void Button_edit_mixed_add_OnClick(object? sender, RoutedEventArgs e)
     {
-        if (string.IsNullOrWhiteSpace(textBox_edit_mixed_name.Text) || comboBox_edit_mixed_baseProduct.SelectedItem is not BaseProductWrapper baseProduct)
+        if (string.IsNullOrWhiteSpace(textBox_edit_mixed_name.Text))
             return;
-        ViewModel.MixedProducts.Add(new MixedProduct
+
+        switch (autoCompleteBox_edit_mixed_baseProduct.SelectedItem)
         {
-            Name = textBox_edit_mixed_name.Text,
-            AskingPrice = (int) numericUpDown_edit_mixed_askingPrice.Value!,
-            Addictiveness = (int) numericUpDown_edit_mixed_addictiveness.Value!,
-            BaseProductId = baseProduct.Id
-        });
+            case BaseProductWrapper baseProduct:
+            {
+                var newProduct = new MixedProduct
+                {
+                    Name = textBox_edit_mixed_name.Text,
+                    AskingPrice = (int)numericUpDown_edit_mixed_askingPrice.Value!,
+                    Addictiveness = (int)numericUpDown_edit_mixed_addictiveness.Value!,
+                    BaseProductId = baseProduct.Id
+                };
+                newProduct.EffectIds.Add(baseProduct.ProductEffect.Id);
+                ViewModel.MixedProducts.Add(newProduct);
+                break;
+            }
+            case MixedProductWrapper mixedProduct:
+            {
+                var newProduct = new MixedProduct
+                {
+                    Name = textBox_edit_mixed_name.Text,
+                    AskingPrice = (int) numericUpDown_edit_mixed_askingPrice.Value!,
+                    Addictiveness = (int) numericUpDown_edit_mixed_addictiveness.Value!,
+                    BaseProductId = mixedProduct.BaseProduct.Id
+                };
+                newProduct.MixablesIds.AddRange(mixedProduct.MixablesIds.Items);
+                newProduct.EffectIds.AddRange(mixedProduct.EffectIds.Items);
+                ViewModel.MixedProducts.Add(newProduct);
+                break;
+            }
+        }
     }
 
     private void Button_edit_mixed_delete_OnClick(object? sender, RoutedEventArgs e)
@@ -144,5 +204,23 @@ public partial class MainWindow : Window
         var selected = dataGrid_edit_ingredients.SelectedItems.Cast<MixableWrapper>().ToList();
         
         ViewModel.EditSelectedMixedProduct.MixablesIds.Edit(list => list.RemoveMany(selected.Select(m => m.Id)));
+    }
+
+    private void Button_edit_mixed_effect_add_OnClick(object? sender, RoutedEventArgs e)
+    {
+        if (ViewModel.EditSelectedMixedProduct == null || comboBox_edit_mixed_effects.SelectionBoxItem is not ProductEffectWrapper effect)
+            return;
+        
+        ViewModel.EditSelectedMixedProduct.EffectIds.Add(effect.Id);
+    }
+    
+    private void Button_edit_mixed_effect_delete_OnClick(object? sender, RoutedEventArgs e)
+    {
+        if (dataGrid_edit_mixedEffects.SelectedItems.Count == 0 || ViewModel.EditSelectedMixedProduct == null)
+            return;
+        
+        var selected = dataGrid_edit_mixedEffects.SelectedItems.Cast<ProductEffectWrapper>().ToList();
+        
+        ViewModel.EditSelectedMixedProduct.EffectIds.Edit(list => list.RemoveMany(selected.Select(m => m.Id)));
     }
 }

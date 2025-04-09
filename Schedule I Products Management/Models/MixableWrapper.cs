@@ -8,15 +8,7 @@ public class MixableWrapper(Mixable mixable) : ReactiveObject
 {
     private Mixable _mixable = mixable;
     
-    public Guid Id
-    {
-        get => _mixable.Id;
-        set
-        {
-            _mixable.Id = value;
-            this.RaisePropertyChanged();
-        }
-    }
+    public Guid Id => _mixable.Id;
     
     public string Name
     {
