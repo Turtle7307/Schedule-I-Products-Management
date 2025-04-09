@@ -1,6 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reactive;
+using System.Reactive.Linq;
+using DynamicData;
 using ReactiveUI;
 using Schedule_I_Products_Management.Models;
 
@@ -9,80 +13,108 @@ namespace Schedule_I_Products_Management.ViewModels;
 public class MainWindowViewModel : ViewModelBase
 {
 #pragma warning disable CA1822 // Mark members as static
-    private ObservableCollection<BaseProductWrapper> _baseProducts = new();
-    private ObservableCollection<MixedProductWrapper> _mixedProducts = new();
-    private ObservableCollection<MixableWrapper> _mixables = new();
+    private SourceList<BaseProductWrapper> _baseProducts = new();
+    private SourceList<MixedProductWrapper> _mixedProducts = new();
+    private SourceList<MixableWrapper> _mixables = new();
     private MixedProductWrapper? _edit_selectedMixedProduct;
-    
-    public ObservableCollection<BaseProductWrapper> BaseProducts
-    {
-        get => _baseProducts;
-        set
-        {
-            this.RaiseAndSetIfChanged(ref _baseProducts, value);
-            this.RaisePropertyChanged(nameof(OverviewFilteredProducts));
-        }
-    }
-    
-    public ObservableCollection<MixedProductWrapper> MixedProducts
-    {
-        get => _mixedProducts;
-        set
-        {
-            this.RaiseAndSetIfChanged(ref _mixedProducts, value);
-            this.RaisePropertyChanged(nameof(OverviewFilteredProducts));
-        }
-    }
 
-    public ObservableCollection<MixableWrapper> Mixables
+    private ReadOnlyObservableCollection<BaseProductWrapper> _readOnlyBaseProducts;
+    private ReadOnlyObservableCollection<MixedProductWrapper> _readOnlyMixedProducts;
+    private ReadOnlyObservableCollection<MixableWrapper> _readOnlyMixables;
+    private ReadOnlyObservableCollection<MixableWrapper> _editSelectedMixables;
+    private ReadOnlyObservableCollection<MixableWrapper> _editSelectedMixablesReverse;
+    private ReadOnlyObservableCollection<IProductWrapperShowData> _overviewFilteredProducts;
+    
+    public SourceList<BaseProductWrapper> BaseProducts => _baseProducts;
+    public SourceList<MixedProductWrapper> MixedProducts => _mixedProducts;
+    public SourceList<MixableWrapper> Mixables => _mixables;
+    
+    public ReadOnlyObservableCollection<BaseProductWrapper> BindableBaseProducts => _readOnlyBaseProducts;
+    public ReadOnlyObservableCollection<MixedProductWrapper> BindableMixedProducts => _readOnlyMixedProducts;
+    public ReadOnlyObservableCollection<MixableWrapper> BindableMixables => _readOnlyMixables;
+    public ReadOnlyObservableCollection<MixableWrapper> EditSelectedMixedProductMixables => _editSelectedMixables;
+    public ReadOnlyObservableCollection<MixableWrapper> EditSelectedMixedProductMixablesReverse => _editSelectedMixablesReverse;
+    public ReadOnlyObservableCollection<IProductWrapperShowData> OverviewFilteredProducts => _overviewFilteredProducts;
+
+    public MainWindowViewModel()
     {
-        get => _mixables;
-        set
-        {
-            this.RaiseAndSetIfChanged(ref _mixables, value);
-            this.RaisePropertyChanged(nameof(EditSelectedMixedProductMixablesReverse));
-        }
+        // BindableBaseProducts
+        _baseProducts.Connect()
+            .ObserveOn(RxApp.MainThreadScheduler)
+            .Bind(out _readOnlyBaseProducts)
+            .Subscribe();
+        
+        // BindableMixables
+        _mixables.Connect()
+            .ObserveOn(RxApp.MainThreadScheduler)
+            .Bind(out _readOnlyMixables)
+            .Subscribe();
+        
+        // BindableMixedProducts
+        _mixedProducts.Connect()
+            .AutoRefreshOnObservable(mpw =>
+                mpw.WhenAnyValue(x => x.BaseProduct)
+                    .SelectMany(bp =>
+                        bp.WhenAnyValue(x => x.Name, x => x.Category)
+                    )
+            )
+            .ObserveOn(RxApp.MainThreadScheduler)
+            .Bind(out _readOnlyMixedProducts)
+            .Subscribe();
+
+        // EditSelectedMixedProductMixables
+        this.WhenAnyValue(x => x.EditSelectedMixedProduct)
+            .Select(mpw =>
+            {
+                if (mpw == null) return Observable.Empty<IChangeSet<MixableWrapper>>();
+
+                return mpw.MixablesIds.Connect()
+                    .Transform(id => _mixables.Items.FirstOrDefault(m => m.Id == id))
+                    .Filter(m => m != null);
+            })
+            .Switch()
+            .ObserveOn(RxApp.MainThreadScheduler)
+            .Bind(out _editSelectedMixables)
+            .Subscribe();
+
+        // EditSelectedMixedProductMixablesReverse
+        this.WhenAnyValue(x => x.EditSelectedMixedProduct)
+            .Select(mpw =>
+            {
+                if (mpw == null)
+                    return Observable.Empty<IChangeSet<MixableWrapper>>();
+
+                var trigger = mpw.MixablesIds.Connect()
+                    .ToCollection()
+                    .Select(_ => Unit.Default);
+
+                return _mixables.Connect()
+                    .AutoRefresh()
+                    .AutoRefreshOnObservable(_ => trigger)
+                    .Filter(m => !mpw.MixablesIds.Items.Contains(m.Id));
+            })
+            .Switch()
+            .ObserveOn(RxApp.MainThreadScheduler)
+            .Bind(out _editSelectedMixablesReverse)
+            .Subscribe();
+
+        // OverviewFilteredProducts
+        _baseProducts.Connect()
+            .AutoRefresh()
+            .Transform(bp => (IProductWrapperShowData)bp)
+            .Merge(_mixedProducts.Connect()
+                .AutoRefresh()
+                .Transform(mp => (IProductWrapperShowData)mp))
+            .ObserveOn(RxApp.MainThreadScheduler)
+            .Bind(out _overviewFilteredProducts)
+            .Subscribe();
     }
 
     public MixedProductWrapper? EditSelectedMixedProduct
     {
         get => _edit_selectedMixedProduct;
-        set
-        {
-            this.RaiseAndSetIfChanged(ref _edit_selectedMixedProduct, value);
-            this.RaisePropertyChanged(nameof(EditSelectedMixedProductMixables));
-            this.RaisePropertyChanged(nameof(EditSelectedMixedProductMixablesReverse));
-        }
-    }
-
-    public List<MixableWrapper> EditSelectedMixedProductMixables
-    {
-        get => _edit_selectedMixedProduct?.MixablesIds
-            .Select(id => _mixables.FirstOrDefault(m => m.Id == id))
-            .Where(m => m != null)
-            .ToList()!;
-        set
-        {
-            if (_edit_selectedMixedProduct == null)
-                return;
-            _edit_selectedMixedProduct.MixablesIds = value.Select(m => m.Id).ToList();
-        }
+        set => this.RaiseAndSetIfChanged(ref _edit_selectedMixedProduct, value);
     }
     
-    public List<MixableWrapper> EditSelectedMixedProductMixablesReverse
-    {
-        get => _mixables.Where(mix => !(_edit_selectedMixedProduct?.MixablesIds.Any(m => m == mix.Id) ?? false)).ToList();
-    }
-
-    public List<IProductWrapperShowData> OverviewFilteredProducts
-    {
-        get
-        {
-            var products = _baseProducts.Select(IProductWrapperShowData (bp) => bp).ToList();
-            products.AddRange(_mixedProducts.Select(IProductWrapperShowData (bp) => bp).ToList());
-            return products;
-        }
-    }
-
 #pragma warning restore CA1822 // Mark members as static
 }

@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Schedule_I_Products_Management.Data;
 
 namespace Schedule_I_Products_Management.Models;
@@ -11,5 +11,5 @@ public interface IProductWrapperShowData
     public int Addictiveness { get; }
     public ProductCategory Category { get; }
     public bool IsMixed { get; }
-    public List<MixableWrapper> Mixables { get; }
+    public ReadOnlyObservableCollection<MixableWrapper> Mixables { get; }
 }

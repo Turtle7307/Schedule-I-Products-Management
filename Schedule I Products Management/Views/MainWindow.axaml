@@ -110,9 +110,9 @@
                 <HeaderedContentControl Header="Buyable Plants" Margin="5">
                     <Grid ColumnDefinitions="2*, *">
                         <Border BorderThickness="1" CornerRadius="4" BorderBrush="{DynamicResource BorderCardBorderBrush}">
-                            <DataGrid Name="dataGrid_edit_buyable" ItemsSource="{Binding BaseProducts}" IsReadOnly="False">
+                            <DataGrid Name="dataGrid_edit_buyable" ItemsSource="{Binding BindableBaseProducts}" IsReadOnly="False">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Name" Binding="{Binding Name}"/>
+                                    <DataGridTextColumn Header="Name" Binding="{Binding Name}" IsReadOnly="False"/>
                                     <DataGridTemplateColumn Header="Cost" SortMemberPath="Cost">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
@@ -194,9 +194,9 @@
                 <HeaderedContentControl Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Header="Mixables" Margin="5">
                     <Grid ColumnDefinitions="*, *">
                         <Border BorderThickness="1" CornerRadius="4" BorderBrush="{DynamicResource BorderCardBorderBrush}">
-                            <DataGrid Name="dataGrid_edit_mixable" ItemsSource="{Binding Mixables}" IsReadOnly="False">
+                            <DataGrid Name="dataGrid_edit_mixable" ItemsSource="{Binding BindableMixables}" IsReadOnly="False">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Name" Binding="{Binding Name}"/>
+                                    <DataGridTextColumn Header="Name" Binding="{Binding Name}" IsReadOnly="False"/>
                                     <DataGridTemplateColumn Header="Cost" SortMemberPath="Cost">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
@@ -231,9 +231,9 @@
                             
                             <!-- Mixed Products -->
                             <Border BorderThickness="1" CornerRadius="4" Margin="5, 0" BorderBrush="{DynamicResource BorderCardBorderBrush}">
-                                <DataGrid Name="dataGrid_edit_mixed" ItemsSource="{Binding MixedProducts}" SelectedItem="{Binding EditSelectedMixedProduct}" IsReadOnly="False">
+                                <DataGrid Name="dataGrid_edit_mixed" ItemsSource="{Binding BindableMixedProducts}" SelectedItem="{Binding EditSelectedMixedProduct}" IsReadOnly="False">
                                     <DataGrid.Columns>
-                                        <DataGridTextColumn Header="Name" Binding="{Binding Name}"/>
+                                        <DataGridTextColumn Header="Name" Binding="{Binding Name}" IsReadOnly="False"/>
                                         <DataGridTemplateColumn Header="Asking Price" SortMemberPath="AskingPrice">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
@@ -261,12 +261,12 @@
                                         <DataGridTemplateColumn Header="Base Product">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
-                                                    <Label Content="{Binding BaseProduct}" VerticalAlignment="Center" Margin="10, 0"/>
+                                                    <Label Content="{Binding BaseProduct.Name}" VerticalAlignment="Center" Margin="10, 0"/>
                                                 </DataTemplate>
                                             </DataGridTemplateColumn.CellTemplate>
                                             <DataGridTemplateColumn.CellEditingTemplate>
                                                 <DataTemplate>
-                                                    <ComboBox SelectedItem="{Binding BaseProduct}" ItemsSource="{Binding ((vm:MainWindowViewModel)DataContext).BaseProducts, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                                                    <ComboBox SelectedItem="{Binding BaseProduct}" ItemsSource="{Binding ((vm:MainWindowViewModel)DataContext).BindableBaseProducts, RelativeSource={RelativeSource AncestorType=Window}}"/>
                                                 </DataTemplate>
                                             </DataGridTemplateColumn.CellEditingTemplate>
                                         </DataGridTemplateColumn>
@@ -308,7 +308,7 @@
                                     <Label Grid.Row="2" Grid.Column="0" Content="Addictiveness:" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5, 5"/>
                                     <NumericUpDown Name="numericUpDown_edit_mixed_addictiveness" Grid.Row="2" Grid.Column="1" Value="0" Minimum="0" Maximum="100" Increment="1" Margin="0, 5"/>
                                     <Label Grid.Row="3" Grid.Column="0" Content="Base Product:" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5, 5"/>
-                                    <ComboBox Name="comboBox_edit_mixed_baseProduct" ItemsSource="{Binding BaseProducts}" Grid.Row="3" Grid.Column="1" SelectedIndex="0" HorizontalAlignment="Stretch" Margin="0, 5"/>
+                                    <ComboBox Name="comboBox_edit_mixed_baseProduct" ItemsSource="{Binding BindableBaseProducts}" Grid.Row="3" Grid.Column="1" SelectedIndex="0" HorizontalAlignment="Stretch" Margin="0, 5"/>
                                     <Button Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Content="Add new Mixed Product" HorizontalAlignment="Center" Margin="0, 5" Click="Button_edit_mixed_add_OnClick"/>
                                     <Button Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Content="Delete selected" HorizontalAlignment="Center" Margin="0, 5" Click="Button_edit_mixed_delete_OnClick"/>
                                 </Grid>

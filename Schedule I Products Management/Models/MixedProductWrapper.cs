@@ -1,6 +1,8 @@
 using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reactive.Linq;
+using DynamicData;
 using ReactiveUI;
 using Schedule_I_Products_Management.Data;
 using Schedule_I_Products_Management.Views;
@@ -10,22 +12,43 @@ namespace Schedule_I_Products_Management.Models;
 public class MixedProductWrapper : ReactiveObject, IProductWrapperShowData
 {
     private MixedProduct _mixedProduct;
+    
+    private readonly ObservableAsPropertyHelper<int> _cost;
+    private ReadOnlyObservableCollection<MixableWrapper> _mixables;
 
     public MixedProductWrapper(MixedProduct mixedProduct)
     {
         _mixedProduct = mixedProduct;
-        foreach(var mixable in MainWindow.ViewModel.Mixables)
-            mixable.WhenAnyValue(x => x.Cost)
-                .ToProperty(this, x => x.Cost);
+
+        _cost = Observable.CombineLatest(
+                MainWindow.ViewModel.Mixables.Connect()
+                    .ToCollection()
+                    .StartWith(MainWindow.ViewModel.Mixables.Items.ToList()),
+                MixablesIds.Connect()
+                    .ToCollection()
+                    .StartWith(MixablesIds.Items.ToList()),
+                (mixables, ids) =>
+                    BaseProduct.Cost + mixables
+                        .Where(m => ids.Contains(m.Id))
+                        .Sum(m => m.Cost)
+            )
+            .ToProperty(this, x => x.Cost, out _cost);
+        
+        this.WhenAnyValue(x => x.MixablesIds)
+            .Select(_ =>
+                MainWindow.ViewModel.Mixables
+                    .Connect()
+                    .Filter(m => MixablesIds.Items.Contains(m.Id))
+                    .Bind(out _mixables)
+                    .AsObservableList())
+            .Switch()
+            .Subscribe();
     }
 
     public ProductCategory Category => BaseProduct.Category;
     public bool IsMixed => true;
-    public int Cost => BaseProduct.Cost + MainWindow.ViewModel.Mixables
-                           .Where(m => MixablesIds.Contains(m.Id))
-                           .Sum(m => m.Cost);
-    public List<MixableWrapper> Mixables =>
-        MainWindow.ViewModel.Mixables.Where(m => MixablesIds.Contains(m.Id)).ToList();
+    public int Cost => _cost.Value;
+    public ReadOnlyObservableCollection<MixableWrapper> Mixables => _mixables;
 
     public Guid Id
     {
@@ -37,9 +60,9 @@ public class MixedProductWrapper : ReactiveObject, IProductWrapperShowData
         }
     }
 
-    public BaseProduct BaseProduct
+    public BaseProductWrapper BaseProduct
     {
-        get => MainWindow.ViewModel.BaseProducts.First(mix => mix.Id == _mixedProduct.BaseProductId);
+        get => MainWindow.ViewModel.BaseProducts.Items.First(mix => mix.Id == _mixedProduct.BaseProductId);
         set
         {
             _mixedProduct.BaseProductId = value.Id;
@@ -77,7 +100,7 @@ public class MixedProductWrapper : ReactiveObject, IProductWrapperShowData
         }
     }
 
-    public List<Guid> MixablesIds
+    public SourceList<Guid> MixablesIds
     {
         get => _mixedProduct.MixablesIds;
         set

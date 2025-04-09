@@ -1,5 +1,5 @@
 using System;
-using System.Collections.Generic;
+using DynamicData;
 
 namespace Schedule_I_Products_Management.Data;
 
@@ -10,5 +10,5 @@ public class MixedProduct : IProduct
     public string Name { get; set; }
     public int AskingPrice { get; set; }
     public int Addictiveness { get; set; }
-    public List<Guid> MixablesIds { get; set; } = new();
+    public SourceList<Guid> MixablesIds { get; set; } = new();
 }
