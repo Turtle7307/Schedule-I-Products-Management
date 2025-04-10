@@ -27,6 +27,7 @@ public class BaseProductWrapper : ReactiveObject, IProductWrapperShowData
     public bool IsMixed => false;
     public int Profit => _profit.Value;
     public ReadOnlyObservableCollection<MixableWrapper> Mixables => new([]);
+    public ReadOnlyObservableCollection<ProductEffectWrapper> Effects => new(ProductEffect.Name.Equals("None") ? [] : [ProductEffect]);
     public Guid Id => _baseProduct.Id;
 
     public ProductEffectWrapper ProductEffect

@@ -15,4 +15,5 @@ public interface IProductWrapperShowData
     public ProductCategory Category { get; }
     public bool IsMixed { get; }
     public ReadOnlyObservableCollection<MixableWrapper> Mixables { get; }
+    public ReadOnlyObservableCollection<ProductEffectWrapper> Effects { get; }
 }

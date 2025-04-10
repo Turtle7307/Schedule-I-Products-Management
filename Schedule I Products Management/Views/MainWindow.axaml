@@ -70,7 +70,7 @@
         <TabItem Header="Products Overview">
             <Grid Margin="5" RowDefinitions="*, 2*">
                 <!-- Filters -->
-                <HeaderedContentControl Header="Search Filters">
+                <HeaderedContentControl Header="Search Filters" Margin="5">
                     <Grid ColumnDefinitions="*, * ,*">
                         <HeaderedContentControl Header="Product">
                             
@@ -114,7 +114,7 @@
                             </Border>
                             
                             <Border Grid.Column="1" BorderThickness="1" CornerRadius="4" Margin="5, 0" BorderBrush="{DynamicResource BorderCardBorderBrush}">
-                                <DataGrid IsReadOnly="True" ItemsSource="{Binding ((m:IProductWrapperShowData)SelectedItem).Mixables, ElementName=dataGrid_overview_filter}">
+                                <DataGrid IsReadOnly="True" ItemsSource="{Binding ((m:IProductWrapperShowData)SelectedItem).Effects, ElementName=dataGrid_overview_filter}">
                                     <DataGrid.Columns>
                                         <DataGridTextColumn Header="Name" Binding="{Binding Name}"/>
                                     </DataGrid.Columns>
