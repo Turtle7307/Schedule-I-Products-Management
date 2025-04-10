@@ -86,7 +86,7 @@ public class MixedProductWrapper : ReactiveObject, IProductWrapperShowData
 
     public BaseProductWrapper BaseProduct
     {
-        get => MainWindow.ViewModel.BaseProducts.Items.FirstOrDefault(mix => mix.Id == _mixedProduct.BaseProductId);
+        get => MainWindow.ViewModel.BaseProducts.Items.FirstOrDefault(mix => mix.Id == _mixedProduct.BaseProductId) ?? new BaseProduct();
         set
         {
             _mixedProduct.BaseProductId = value.Id;
