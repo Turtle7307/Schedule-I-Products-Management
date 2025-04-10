@@ -68,13 +68,28 @@
     <TabControl>
         <!-- List Products -->
         <TabItem Header="Products Overview">
-            <Grid Margin="5" RowDefinitions="*, *">
+            <Grid Margin="5" RowDefinitions="*, 2*">
+                <!-- Filters -->
+                <HeaderedContentControl Header="Search Filters">
+                    <Grid ColumnDefinitions="*, * ,*">
+                        <HeaderedContentControl Header="Product">
+                            
+                        </HeaderedContentControl>
+                        
+                        <HeaderedContentControl Grid.Column="1" Header="Mixable">
+                            
+                        </HeaderedContentControl>
+                        
+                        <HeaderedContentControl Grid.Column="2" Header="Effect">
+                            
+                        </HeaderedContentControl>
+                    </Grid>
+                </HeaderedContentControl>
                 
-                
-                <!--  -->
-                <HeaderedContentControl Grid.Row="1" Header="Registered Products" Margin="5">
-                    <Grid Margin="5" ColumnDefinitions="*, *">
-                        <Border BorderThickness="1" CornerRadius="4" BorderBrush="{DynamicResource BorderCardBorderBrush}">
+                <!-- Matching Products Overview -->
+                <HeaderedContentControl Grid.Row="1" Header="Matching Products" Margin="5">
+                    <Grid ColumnDefinitions="2*, *">
+                        <Border BorderThickness="1" CornerRadius="4" Margin="5, 0" BorderBrush="{DynamicResource BorderCardBorderBrush}">
                             <DataGrid Name="dataGrid_overview_filter" IsReadOnly="True" SelectionMode="Single" ItemsSource="{Binding OverviewFilteredProducts}">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="Name" Binding="{Binding Name}"/>
@@ -89,7 +104,7 @@
                         </Border>
                         
                         <Grid Grid.Column="1" ColumnDefinitions="*, *">
-                            <Border BorderThickness="1" CornerRadius="4" BorderBrush="{DynamicResource BorderCardBorderBrush}">
+                            <Border BorderThickness="1" CornerRadius="4" Margin="5, 0" BorderBrush="{DynamicResource BorderCardBorderBrush}">
                                 <DataGrid IsReadOnly="True" ItemsSource="{Binding ((m:IProductWrapperShowData)SelectedItem).Mixables, ElementName=dataGrid_overview_filter}">
                                     <DataGrid.Columns>
                                         <DataGridTextColumn Header="Name" Binding="{Binding Name}"/>
@@ -98,7 +113,13 @@
                                 </DataGrid>
                             </Border>
                             
-                            
+                            <Border Grid.Column="1" BorderThickness="1" CornerRadius="4" Margin="5, 0" BorderBrush="{DynamicResource BorderCardBorderBrush}">
+                                <DataGrid IsReadOnly="True" ItemsSource="{Binding ((m:IProductWrapperShowData)SelectedItem).Mixables, ElementName=dataGrid_overview_filter}">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Name" Binding="{Binding Name}"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </Border>
                         </Grid>
                     </Grid>
                 </HeaderedContentControl>
@@ -268,7 +289,7 @@
                 <!-- Mixed Products & Ingredients -->
                 <HeaderedContentControl Grid.Row="1" Header="Mixed Products" Margin="5">
                     <Grid ColumnDefinitions="1.5*, *">
-                        <Grid ColumnDefinitions="3.5*, *, *" Margin="10, 0, 0, 0">
+                        <Grid ColumnDefinitions="3.5*, *, *">
                             
                             <!-- Mixed Products -->
                             <Border BorderThickness="1" CornerRadius="4" Margin="5, 0" BorderBrush="{DynamicResource BorderCardBorderBrush}">
