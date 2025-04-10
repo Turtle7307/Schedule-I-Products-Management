@@ -13,7 +13,7 @@ public partial class MainWindow : Window
 {
     private const string DataZipFile = "data.zip";
     private const string BaseProductsJsonFile = "baseProducts.json";
-    private const string MixablesJsonFile = "mixablesProducts.json";
+    private const string MixablesJsonFile = "mixables.json";
     private const string MixedProductsJsonFile = "mixedProducts.json";
     private const string ProductEffectsJsonFile = "productEffects.json";
     
