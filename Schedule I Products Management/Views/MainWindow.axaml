@@ -128,7 +128,7 @@
         
         <!-- Modify Products -->
         <TabItem Header="Products Management">
-            <Grid RowDefinitions="Auto, *" Margin="5">
+            <Grid RowDefinitions="400, *" Margin="5">
                 
                 <!-- Top -->
                 <Grid ColumnDefinitions="2.5*, *, *">
