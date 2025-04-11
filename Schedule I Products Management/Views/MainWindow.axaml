@@ -217,7 +217,7 @@
                                 <Label Grid.Row="3" Grid.Column="0" Content="Addictiveness:" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5, 5"/>
                                 <NumericUpDown Name="numericUpDown_edit_buyable_addictiveness" Grid.Row="3" Grid.Column="1" Value="0" Minimum="0" Maximum="100" Increment="1" Margin="0, 5"/>
                                 <Label Grid.Row="4" Grid.Column="0" Content="Effect:" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5, 5"/>
-                                <ComboBox Grid.Row="4" Name="comboBox_edit_buyable_effect" ItemsSource="{Binding BindableProductEffects}" Grid.Column="1" SelectedIndex="0" HorizontalAlignment="Stretch" Margin="0, 5"/>
+                                <AutoCompleteBox Grid.Row="4" Name="autoCompleteBox_edit_buyable_effect" ItemsSource="{Binding BindableProductEffects}" MinimumPrefixLength="0" Grid.Column="1" HorizontalAlignment="Stretch" Margin="0, 5"/>
                                 <Label Grid.Row="5" Grid.Column="0" Content="Category:" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5, 5"/>
                                 <ComboBox Grid.Row="5" Name="comboBox_edit_buyable_category" Grid.Column="1" SelectedIndex="0" HorizontalAlignment="Stretch" Margin="0, 5">
                                     <dat:ProductCategory>Marijuana</dat:ProductCategory>
@@ -388,7 +388,7 @@
                             <HeaderedContentControl Grid.Column="1" Header="Mixables Controls" Margin="5, 0">
                                 <Grid ColumnDefinitions="*, *" RowDefinitions="Auto, Auto, Auto" Margin="5">
                                     <Label Grid.Column="0" Content="Mixable:" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5, 5"/>
-                                    <ComboBox Name="comboBox_edit_ingredients_mixable" ItemsSource="{Binding EditSelectedMixedProductMixablesReverse}" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" Margin="0, 5"/>
+                                    <AutoCompleteBox Name="autoCompleteBox_edit_ingredients_mixable" ItemsSource="{Binding EditSelectedMixedProductMixablesReverse}" MinimumPrefixLength="0" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" Margin="0, 5"/>
                                     <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Content="Add new Mixable to Product" HorizontalAlignment="Center" Margin="0, 5" Click="Button_edit_ingredients_add_OnClick"/>
                                     <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Content="Delete selected" HorizontalAlignment="Center" Margin="0, 5" Click="Button_edit_ingredients_delete_OnClick"/>
                                 </Grid>
@@ -398,7 +398,7 @@
                                 <HeaderedContentControl Header="Effects Controls" Margin="5, 0">
                                     <Grid ColumnDefinitions="*, *" RowDefinitions="Auto, Auto, Auto" Margin="5">
                                         <Label Grid.Column="0" Content="Effect:" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5, 5"/>
-                                        <ComboBox Name="comboBox_edit_mixed_effects" ItemsSource="{Binding EditSelectedMixedProducteffectsReverse}" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" Margin="0, 5"/>
+                                        <AutoCompleteBox Name="autoCompleteBox_edit_mixed_effects" ItemsSource="{Binding EditSelectedMixedProducteffectsReverse}" MinimumPrefixLength="0" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" Margin="0, 5"/>
                                         <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Content="Add new Effect to Product" HorizontalAlignment="Center" Margin="0, 5" Click="Button_edit_mixed_effect_add_OnClick"/>
                                         <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Content="Delete selected" HorizontalAlignment="Center" Margin="0, 5" Click="Button_edit_mixed_effect_delete_OnClick"/>
                                     </Grid>

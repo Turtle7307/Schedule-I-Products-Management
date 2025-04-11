@@ -62,7 +62,7 @@ public partial class MainWindow : Window
     private void Button_edit_buyable_add_OnClick(object? sender, RoutedEventArgs e)
     {
         if (string.IsNullOrWhiteSpace(textBox_edit_buyable_name.Text) ||
-            comboBox_edit_buyable_effect.SelectedItem is not ProductEffectWrapper)
+            autoCompleteBox_edit_buyable_effect.SelectedItem is not ProductEffectWrapper)
             return;
         ViewModel.BaseProducts.Add(new BaseProduct
         {
@@ -70,8 +70,8 @@ public partial class MainWindow : Window
             Cost = (int) numericUpDown_edit_buyable_cost.Value!,
             AskingPrice = (int) numericUpDown_edit_buyable_askingPrice.Value!,
             Addictiveness = (int) numericUpDown_edit_buyable_addictiveness.Value!,
-            EffectId = ((ProductEffectWrapper) comboBox_edit_buyable_effect.SelectedItem!).Id,
-            Category = (ProductCategory) comboBox_edit_buyable_category.SelectionBoxItem!
+            EffectId = ((ProductEffectWrapper) autoCompleteBox_edit_buyable_effect.SelectedItem!).Id,
+            Category = (ProductCategory) comboBox_edit_buyable_category.SelectedItem!
         });
     }
 
@@ -190,7 +190,7 @@ public partial class MainWindow : Window
 
     private void Button_edit_ingredients_add_OnClick(object? sender, RoutedEventArgs e)
     {
-        if (ViewModel.EditSelectedMixedProduct == null || comboBox_edit_ingredients_mixable.SelectionBoxItem is not MixableWrapper mixable)
+        if (ViewModel.EditSelectedMixedProduct == null || autoCompleteBox_edit_ingredients_mixable.SelectedItem is not MixableWrapper mixable)
             return;
         
         ViewModel.EditSelectedMixedProduct.MixablesIds.Add(mixable.Id);
@@ -208,7 +208,7 @@ public partial class MainWindow : Window
 
     private void Button_edit_mixed_effect_add_OnClick(object? sender, RoutedEventArgs e)
     {
-        if (ViewModel.EditSelectedMixedProduct == null || comboBox_edit_mixed_effects.SelectionBoxItem is not ProductEffectWrapper effect)
+        if (ViewModel.EditSelectedMixedProduct == null || autoCompleteBox_edit_mixed_effects.SelectedItem is not ProductEffectWrapper effect)
             return;
         
         ViewModel.EditSelectedMixedProduct.EffectIds.Add(effect.Id);
