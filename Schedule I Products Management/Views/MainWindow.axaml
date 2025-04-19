@@ -3,6 +3,7 @@
         xmlns:vm="using:Schedule_I_Products_Management.ViewModels"
         xmlns:dat="using:Schedule_I_Products_Management.Data"
         xmlns:m="using:Schedule_I_Products_Management.Models"
+        xmlns:agc="clr-namespace:AvaloniaGraphControl;assembly=AvaloniaGraphControl"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="1500" d:DesignHeight="780"
@@ -123,6 +124,41 @@
                         </Grid>
                     </Grid>
                 </HeaderedContentControl>
+            </Grid>
+        </TabItem>
+        
+        <!-- Missing Products -->
+        <TabItem Header="Missing Products">
+            <Grid RowDefinitions="Auto, *">
+                <Grid Margin="5">
+                    <ComboBox ItemsSource="{Binding BindableBaseProducts}" SelectedItem="{Binding MissingSelectedBaseProduct}"/>
+                </Grid>
+                
+                <Grid Grid.Row="1" ColumnDefinitions="*, Auto">
+                    <Border Margin="5" BorderThickness="1" CornerRadius="4" BorderBrush="{DynamicResource BorderCardBorderBrush}">
+                        <ZoomBorder ClipToBounds="True" Focusable="True" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                            <agc:GraphPanel Graph="{Binding MissingGraph}" LayoutMethod="SugiyamaScheme">
+                                <agc:GraphPanel.DataTemplates>
+                                    <DataTemplate DataType="{x:Type m:ProductNode}">
+                                        <Button Content="{Binding Name}" Background="{Binding BackgroundColor}" Foreground="Black" Command="{Binding}"/>
+                                    </DataTemplate>
+                                    <DataTemplate DataType="{x:Type agc:Edge}">
+                                        <agc:Connection Brush="DarkCyan"/>
+                                    </DataTemplate>
+                                </agc:GraphPanel.DataTemplates>
+                            </agc:GraphPanel>
+                        </ZoomBorder>
+                    </Border>
+                    
+                    <Border Grid.Column="1" Margin="5" BorderThickness="1" CornerRadius="4" BorderBrush="{DynamicResource BorderCardBorderBrush}">
+                        <DataGrid ItemsSource="{Binding MissingMixables}">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Name" Binding="{Binding Name}"/>
+                                <DataGridTextColumn Header="Cost" Binding="{Binding Cost, StringFormat='{}{0}$'}"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Border>
+                </Grid>
             </Grid>
         </TabItem>
         

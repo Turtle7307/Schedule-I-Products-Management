@@ -193,7 +193,7 @@ public partial class MainWindow : Window
         if (ViewModel.EditSelectedMixedProduct == null || autoCompleteBox_edit_ingredients_mixable.SelectedItem is not MixableWrapper mixable)
             return;
         
-        ViewModel.EditSelectedMixedProduct.MixablesIds.Add(mixable.Id);
+        ViewModel.MixedProducts.Items.First(p => p.Id == ViewModel.EditSelectedMixedProduct.Id).MixablesIds.Add(mixable.Id);
     }
 
     private void Button_edit_ingredients_delete_OnClick(object? sender, RoutedEventArgs e)
@@ -202,8 +202,8 @@ public partial class MainWindow : Window
             return;
         
         var selected = dataGrid_edit_ingredients.SelectedItems.Cast<MixableWrapper>().ToList();
-        
-        ViewModel.EditSelectedMixedProduct.MixablesIds.Edit(list => list.RemoveMany(selected.Select(m => m.Id)));
+        ViewModel.MixedProducts.Items.First(p => p.Id == ViewModel.EditSelectedMixedProduct.Id)
+            .MixablesIds.Edit(list => list.RemoveMany(selected.Select(m => m.Id)));
     }
 
     private void Button_edit_mixed_effect_add_OnClick(object? sender, RoutedEventArgs e)

@@ -19,6 +19,9 @@ public class MixedProductWrapper : ReactiveObject, IProductWrapperShowData
     private int _profit;
     private ReadOnlyObservableCollection<MixableWrapper> _mixables;
     private ReadOnlyObservableCollection<ProductEffectWrapper> _effects;
+    
+    public ref SourceList<Guid> EffectIds => ref _effectIds;
+    public ref SourceList<Guid> MixablesIds => ref _mixablesIds;
 
     public MixedProductWrapper(MixedProduct mixedProduct)
     {
@@ -43,25 +46,15 @@ public class MixedProductWrapper : ReactiveObject, IProductWrapperShowData
             .ToProperty(this, x => x.Cost, out _cost);
         
         // Mixables
-        this.WhenAnyValue(x => x.MixablesIds)
-            .Select(_ =>
-                MainWindow.ViewModel.Mixables
-                    .Connect()
-                    .Filter(m => MixablesIds.Items.Contains(m.Id))
-                    .Bind(out _mixables)
-                    .AsObservableList())
-            .Switch()
+        _mixablesIds.Connect()
+            .Transform(m => MainWindow.ViewModel.Mixables.Items.First(mix => mix.Id == m))
+            .Bind(out _mixables)
             .Subscribe();
         
         // Effects
-        this.WhenAnyValue(x => x.EffectIds)
-            .Select(_ =>
-                MainWindow.ViewModel.ProductEffects
-                    .Connect()
-                    .Filter(m => EffectIds.Items.Contains(m.Id))
-                    .Bind(out _effects)
-                    .AsObservableList())
-            .Switch()
+        _effectIds.Connect()
+            .Transform(m => MainWindow.ViewModel.ProductEffects.Items.First(eff => eff.Id == m))
+            .Bind(out _effects)
             .Subscribe();
         
         // Profit
@@ -120,26 +113,6 @@ public class MixedProductWrapper : ReactiveObject, IProductWrapperShowData
         set
         {
             _mixedProduct.Addictiveness = value;
-            this.RaisePropertyChanged();
-        }
-    }
-
-    public SourceList<Guid> EffectIds
-    {
-        get => _effectIds;
-        set
-        {
-            _effectIds = value;
-            this.RaisePropertyChanged();
-        }
-    }
-
-    public SourceList<Guid> MixablesIds
-    {
-        get => _mixablesIds;
-        set
-        {
-            _mixablesIds = value;
             this.RaisePropertyChanged();
         }
     }
