@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Linq;
 using Avalonia.Controls;
@@ -83,7 +84,7 @@ public partial class MainWindow : Window
         var selected = dataGrid_edit_buyable.SelectedItems.Cast<BaseProductWrapper>().ToList();
 
         ViewModel.MixedProducts.Edit(list => list.RemoveMany(ViewModel.MixedProducts.Items
-            .Where(mp => selected.Select(x => x.Id).Contains(mp.BaseProduct.Id))));
+            .Where(mp => selected.Select(x => x.Id).Contains(mp.BaseProduct?.Id ?? Guid.Empty))));
         ViewModel.BaseProducts.Edit(list => list.RemoveMany(selected));
     }
 
@@ -104,13 +105,6 @@ public partial class MainWindow : Window
             return;
 
         var selected = dataGrid_edit_mixable.SelectedItems.Cast<MixableWrapper>().ToList();
-
-        //clean all mixedProducts of the deleted mixables
-        foreach (var mixedProduct in ViewModel.MixedProducts.Items.Where(x =>
-                     x.MixablesIds.Items.Any(id => selected.Select(sx => sx.Id).Contains(id))))
-            foreach (var wrapper in selected.Where(wrapper => mixedProduct.MixablesIds.Items.Contains(wrapper.Id)))
-                mixedProduct.MixablesIds.Remove(wrapper.Id);
-        
         ViewModel.Mixables.Edit(list => list.RemoveMany(selected));
     }
 
@@ -143,39 +137,20 @@ public partial class MainWindow : Window
 
     private void Button_edit_mixed_add_OnClick(object? sender, RoutedEventArgs e)
     {
-        if (string.IsNullOrWhiteSpace(textBox_edit_mixed_name.Text))
+        if (string.IsNullOrWhiteSpace(textBox_edit_mixed_name.Text) ||
+            comboBox_edit_mixed_baseProduct.SelectedItem == null)
             return;
 
-        switch (autoCompleteBox_edit_mixed_baseProduct.SelectedItem)
+        var baseProduct = (BaseProductWrapper) comboBox_edit_mixed_baseProduct.SelectedItem;
+        var newProduct = new MixedProduct
         {
-            case BaseProductWrapper baseProduct:
-            {
-                var newProduct = new MixedProduct
-                {
-                    Name = textBox_edit_mixed_name.Text,
-                    AskingPrice = (int)numericUpDown_edit_mixed_askingPrice.Value!,
-                    Addictiveness = (int)numericUpDown_edit_mixed_addictiveness.Value!,
-                    BaseProductId = baseProduct.Id
-                };
-                newProduct.EffectIds.Add(baseProduct.ProductEffect.Id);
-                ViewModel.MixedProducts.Add(newProduct);
-                break;
-            }
-            case MixedProductWrapper mixedProduct:
-            {
-                var newProduct = new MixedProduct
-                {
-                    Name = textBox_edit_mixed_name.Text,
-                    AskingPrice = (int) numericUpDown_edit_mixed_askingPrice.Value!,
-                    Addictiveness = (int) numericUpDown_edit_mixed_addictiveness.Value!,
-                    BaseProductId = mixedProduct.BaseProduct.Id
-                };
-                newProduct.MixablesIds.AddRange(mixedProduct.MixablesIds.Items);
-                newProduct.EffectIds.AddRange(mixedProduct.EffectIds.Items);
-                ViewModel.MixedProducts.Add(newProduct);
-                break;
-            }
-        }
+            Name = textBox_edit_mixed_name.Text,
+            AskingPrice = (int)numericUpDown_edit_mixed_askingPrice.Value!,
+            Addictiveness = (int)numericUpDown_edit_mixed_addictiveness.Value!,
+            BaseProductId = baseProduct.Id
+        };
+        newProduct.EffectIds.AddRange(baseProduct.Effects.Select(x => x.Id));
+        ViewModel.MixedProducts.Add(newProduct);
     }
 
     private void Button_edit_mixed_delete_OnClick(object? sender, RoutedEventArgs e)
@@ -188,22 +163,28 @@ public partial class MainWindow : Window
         ViewModel.MixedProducts.Edit(list => list.RemoveMany(selected));
     }
 
-    private void Button_edit_ingredients_add_OnClick(object? sender, RoutedEventArgs e)
+    private void Button_edit_mixed_recipe_add_OnClick(object? sender, RoutedEventArgs e)
     {
-        if (ViewModel.EditSelectedMixedProduct == null || autoCompleteBox_edit_ingredients_mixable.SelectedItem is not MixableWrapper mixable)
+        if (ViewModel.EditSelectedMixedProduct == null ||
+            autoCompleteBox_edit_mixed_recipe_product.SelectedItem is not IProductWrapper productWrapper ||
+            autoCompleteBox_edit_mixed_recipe_mixable.SelectedItem is not MixableWrapper mixableWrapper)
             return;
         
-        ViewModel.MixedProducts.Items.First(p => p.Id == ViewModel.EditSelectedMixedProduct.Id).MixablesIds.Add(mixable.Id);
+        ViewModel.EditSelectedMixedProduct.RecipesSourceList.Add(new ProductRecipe
+        {
+            BaseProductId = productWrapper.Id,
+            MixableId = mixableWrapper.Id
+        });
     }
 
-    private void Button_edit_ingredients_delete_OnClick(object? sender, RoutedEventArgs e)
+    private void Button_edit_mixed_recipe_delete_OnClick(object? sender, RoutedEventArgs e)
     {
-        if (dataGrid_edit_ingredients.SelectedItems.Count == 0 || ViewModel.EditSelectedMixedProduct == null)
+        if (ViewModel.EditSelectedMixedProduct == null || dataGrid_edit_recipes.SelectedItems.Count == 0)
             return;
-        
-        var selected = dataGrid_edit_ingredients.SelectedItems.Cast<MixableWrapper>().ToList();
-        ViewModel.MixedProducts.Items.First(p => p.Id == ViewModel.EditSelectedMixedProduct.Id)
-            .MixablesIds.Edit(list => list.RemoveMany(selected.Select(m => m.Id)));
+
+        var selected = dataGrid_edit_recipes.SelectedItems.Cast<ProductRecipeWrapper>().ToList();
+
+        ViewModel.EditSelectedMixedProduct.RecipesSourceList.Edit(list => list.RemoveMany(selected));
     }
 
     private void Button_edit_mixed_effect_add_OnClick(object? sender, RoutedEventArgs e)

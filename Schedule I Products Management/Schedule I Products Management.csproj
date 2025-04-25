@@ -28,4 +28,9 @@
         <PackageReference Include="Semi.Avalonia" Version="11.2.1.6" />
         <PackageReference Include="Semi.Avalonia.DataGrid" Version="11.2.1.6" />
     </ItemGroup>
+
+
+    <ItemGroup>
+      <Folder Include="Data\Json\" />
+    </ItemGroup>
 </Project>

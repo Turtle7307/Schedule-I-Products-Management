@@ -1,59 +1,51 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Linq;
+using Avalonia.Data;
 using DynamicData;
+using DynamicData.Aggregation;
 using ReactiveUI;
 using Schedule_I_Products_Management.Data;
 using Schedule_I_Products_Management.Views;
 
 namespace Schedule_I_Products_Management.Models;
 
-public class MixedProductWrapper : ReactiveObject, IProductWrapperShowData
+public class MixedProductWrapper : ReactiveObject, IProductWrapper
 {
     private MixedProduct _mixedProduct;
-    private SourceList<Guid> _mixablesIds = new();
     private SourceList<Guid> _effectIds = new();
-    
-    private readonly ObservableAsPropertyHelper<int> _cost;
+    private SourceList<ProductRecipeWrapper> _recipes = new();
+
+    private int _cost;
     private int _profit;
-    private ReadOnlyObservableCollection<MixableWrapper> _mixables;
     private ReadOnlyObservableCollection<ProductEffectWrapper> _effects;
+    private ReadOnlyObservableCollection<ProductRecipeWrapper> _bindableRecipes;
     
     public ref SourceList<Guid> EffectIds => ref _effectIds;
-    public ref SourceList<Guid> MixablesIds => ref _mixablesIds;
+    public ref SourceList<ProductRecipeWrapper> RecipesSourceList => ref _recipes;
 
     public MixedProductWrapper(MixedProduct mixedProduct)
     {
         _mixedProduct = mixedProduct;
-        _mixablesIds.AddRange(mixedProduct.MixablesIds);
         _effectIds.AddRange(mixedProduct.EffectIds);
+        _recipes.AddRange(mixedProduct.ProductRecipes.Select(ProductRecipeWrapper (x) => x));
 
         // Cost
-        _cost = Observable.CombineLatest(
-                MainWindow.ViewModel.Mixables.Connect()
-                    .AutoRefresh()
-                    .ToCollection()
-                    .StartWith(MainWindow.ViewModel.Mixables.Items.ToList()),
-                MixablesIds.Connect()
-                    .ToCollection()
-                    .StartWith(MixablesIds.Items.ToList()),
-                (mixables, ids) =>
-                    BaseProduct.Cost + mixables
-                        .Where(m => ids.Contains(m.Id))
-                        .Sum(m => m.Cost)
-            )
-            .ToProperty(this, x => x.Cost, out _cost);
-        
-        // Mixables
-        _mixablesIds.Connect()
-            .Transform(m => MainWindow.ViewModel.Mixables.Items.First(mix => mix.Id == m))
-            .Bind(out _mixables)
-            .Subscribe();
+        _recipes.Connect()
+            .AutoRefresh()
+            .Minimum(x => x.BaseProduct?.Cost ?? 0 + x.AddedMixable?.Cost ?? 0)
+            .Subscribe(cost =>
+            {
+                _cost = cost;
+                this.RaisePropertyChanged(nameof(Cost));
+            });
         
         // Effects
         _effectIds.Connect()
-            .Transform(m => MainWindow.ViewModel.ProductEffects.Items.First(eff => eff.Id == m))
+            .Transform(m => MainWindow.ViewModel.ProductEffects.Items.FirstOrDefault(eff => eff.Id == m,
+                (ProductEffectWrapper) new ProductEffect{Name = "Not Found"}))
             .Bind(out _effects)
             .Subscribe();
         
@@ -67,21 +59,29 @@ public class MixedProductWrapper : ReactiveObject, IProductWrapperShowData
                 _profit = i;
                 this.RaisePropertyChanged(nameof(Profit));
             });
+        
+        // Recipes
+        _recipes.Connect()
+            .ObserveOn(RxApp.MainThreadScheduler)
+            .Bind(out _bindableRecipes)
+            .Subscribe();
     }
 
     public ProductCategory Category => BaseProduct.Category;
     public bool IsMixed => true;
-    public int Cost => _cost.Value;
+    public int Cost => _cost;
     public int Profit => _profit;
-    public ReadOnlyObservableCollection<MixableWrapper> Mixables => _mixables;
     public ReadOnlyObservableCollection<ProductEffectWrapper> Effects => _effects;
+    public ReadOnlyObservableCollection<ProductRecipeWrapper> Recipes => _bindableRecipes;
     public Guid Id => _mixedProduct.Id;
 
-    public BaseProductWrapper BaseProduct
+    public BaseProductWrapper? BaseProduct
     {
-        get => MainWindow.ViewModel.BaseProducts.Items.First(mix => mix.Id == _mixedProduct.BaseProductId);
+        get => MainWindow.ViewModel.BaseProducts.Items.FirstOrDefault(bas => bas.Id == _mixedProduct.BaseProductId);
         set
         {
+            if (value == null)
+                throw new DataValidationException("can not be null");
             _mixedProduct.BaseProductId = value.Id;
             this.RaisePropertyChanged();
         }
@@ -120,8 +120,9 @@ public class MixedProductWrapper : ReactiveObject, IProductWrapperShowData
     public static implicit operator MixedProductWrapper(MixedProduct mixedProduct) => new (mixedProduct);
     public static implicit operator MixedProduct(MixedProductWrapper mixedProductWrapper)
     {
-        mixedProductWrapper._mixedProduct.MixablesIds = mixedProductWrapper._mixablesIds.Items.ToList();
         mixedProductWrapper._mixedProduct.EffectIds = mixedProductWrapper._effectIds.Items.ToList();
+        mixedProductWrapper._mixedProduct.ProductRecipes =
+            mixedProductWrapper._recipes.Items.Select(ProductRecipe (x) => x).ToList();
         return mixedProductWrapper._mixedProduct;
     }
 

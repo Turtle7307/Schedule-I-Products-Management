@@ -9,10 +9,10 @@ namespace Schedule_I_Products_Management.Models;
 public class ProductNode : ReactiveObject, ICommand
 {
     public event EventHandler? CanExecuteChanged;
-    private IProductWrapperShowData? _product;
+    private IProductWrapper? _product;
     public Action? OnClick { get; set; }
     
-    public ProductNode(IProductWrapperShowData? product, Action? onClick = null)
+    public ProductNode(IProductWrapper? product, Action? onClick = null)
     {
         _product = product;
         OnClick = onClick;

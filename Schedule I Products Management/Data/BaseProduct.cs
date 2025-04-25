@@ -9,7 +9,7 @@ public class BaseProduct
     public int Cost { get; set; }
     public int AskingPrice { get; set; }
     public int Addictiveness { get; set; }
-    public Guid EffectId { get; set; }
+    public Guid? EffectId { get; set; }
     public ProductCategory Category { get; set; }
     
     public override string ToString()

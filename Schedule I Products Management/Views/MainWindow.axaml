@@ -106,16 +106,17 @@
                         
                         <Grid Grid.Column="1" ColumnDefinitions="*, *">
                             <Border BorderThickness="1" CornerRadius="4" Margin="5, 0" BorderBrush="{DynamicResource BorderCardBorderBrush}">
-                                <DataGrid IsReadOnly="True" ItemsSource="{Binding ((m:IProductWrapperShowData)SelectedItem).Mixables, ElementName=dataGrid_overview_filter}">
-                                    <DataGrid.Columns>
-                                        <DataGridTextColumn Header="Name" Binding="{Binding Name}"/>
-                                        <DataGridTextColumn Header="Cost" Binding="{Binding Cost, StringFormat='{}{0}$'}"/>
-                                    </DataGrid.Columns>
-                                </DataGrid>
+                                <ListBox ItemsSource="{Binding ((m:IProductWrapper)SelectedItem).Recipes, ElementName=dataGrid_overview_filter}">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <Label Content="{Binding AsString}"/>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
                             </Border>
                             
                             <Border Grid.Column="1" BorderThickness="1" CornerRadius="4" Margin="5, 0" BorderBrush="{DynamicResource BorderCardBorderBrush}">
-                                <DataGrid IsReadOnly="True" ItemsSource="{Binding ((m:IProductWrapperShowData)SelectedItem).Effects, ElementName=dataGrid_overview_filter}">
+                                <DataGrid IsReadOnly="True" ItemsSource="{Binding ((m:IProductWrapper)SelectedItem).Effects, ElementName=dataGrid_overview_filter}">
                                     <DataGrid.Columns>
                                         <DataGridTextColumn Header="Name" Binding="{Binding Name}"/>
                                     </DataGrid.Columns>
@@ -260,7 +261,7 @@
                                     <dat:ProductCategory>Methamphetamine</dat:ProductCategory>
                                     <dat:ProductCategory>Cocaine</dat:ProductCategory>
                                 </ComboBox>
-                                <Button Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" Content="Add new Buyable Plant" HorizontalAlignment="Center" Margin="0, 5" Click="Button_edit_buyable_add_OnClick"/>
+                                <Button Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" Content="Add Buyable Plant" HorizontalAlignment="Center" Margin="0, 5" Click="Button_edit_buyable_add_OnClick"/>
                                 <Button Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" Content="Delete selected" HorizontalAlignment="Center" Margin="0, 5" Click="Button_edit_buyable_delete_OnClick"/>
                             </Grid>
                         </Grid>
@@ -294,7 +295,7 @@
                                 <TextBox Name="textBox_edit_mixable_name" Grid.Row="0" Grid.Column="1" Margin="0, 5"/>
                                 <Label Grid.Row="1" Grid.Column="0" Content="Price:" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5, 5"/>
                                 <NumericUpDown Name="numericUpDown_edit_mixable_price" Grid.Row="1" Grid.Column="1" Minimum="0" Increment="1" Value="3" Margin="0, 5"/>
-                                <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Content="Add new Mixable" HorizontalAlignment="Center" Margin="0, 5" Click="Button_edit_mixable_add_OnClick"/>
+                                <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Content="Add Mixable" HorizontalAlignment="Center" Margin="0, 5" Click="Button_edit_mixable_add_OnClick"/>
                                 <Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Content="Delete selected" HorizontalAlignment="Center" Margin="0, 5" Click="Button_edit_mixable_delete_OnClick"/>
                             </Grid>
                         </Grid>
@@ -314,7 +315,7 @@
                             <Grid Grid.Column="1" ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto, Auto" Margin="5">
                                 <Label Content="Name:" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5, 5"/>
                                 <TextBox Name="textBox_edit_effect_name" Grid.Row="0" Grid.Column="1" Margin="0, 5"/>
-                                <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Content="Add new Effect" HorizontalAlignment="Center" Margin="0, 5" Click="Button_edit_effect_add_OnClick"/>
+                                <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Content="Add Effect" HorizontalAlignment="Center" Margin="0, 5" Click="Button_edit_effect_add_OnClick"/>
                                 <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Content="Delete selected" HorizontalAlignment="Center" Margin="0, 5" Click="Button_edit_effect_delete_OnClick"/>
                             </Grid>
                         </Grid>
@@ -379,17 +380,33 @@
                                 </DataGrid>
                             </Border>
                             
-                            <!-- Mixed Product Ingredients -->
+                            <!-- Mixed Product Recipes -->
                             <Border Grid.Column="1" BorderThickness="1" CornerRadius="4" Margin="5, 0" BorderBrush="{DynamicResource BorderCardBorderBrush}">
-                                <DataGrid Name="dataGrid_edit_ingredients" ItemsSource="{Binding EditSelectedMixedProductMixables}" IsReadOnly="True">
+                                <DataGrid Name="dataGrid_edit_recipes" ItemsSource="{Binding EditSelectedMixedProduct.Recipes}">
                                     <DataGrid.Columns>
-                                        <DataGridTextColumn Header="Name" Binding="{Binding Name}"/>
-                                        <DataGridTemplateColumn Header="Cost" SortMemberPath="Cost">
+                                        <DataGridTemplateColumn Header="Base Product">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
-                                                    <Label Content="{Binding Cost, StringFormat='{}{0}$'}" VerticalAlignment="Center" Margin="10, 0"/>
+                                                    <Label Content="{Binding BaseProduct.Name, FallbackValue='Not Found'}" VerticalAlignment="Center" Margin="10, 0"/>
                                                 </DataTemplate>
                                             </DataGridTemplateColumn.CellTemplate>
+                                            <DataGridTemplateColumn.CellEditingTemplate>
+                                                <DataTemplate>
+                                                    <AutoCompleteBox ItemsSource="{Binding ((vm:MainWindowViewModel)DataContext).EditSelectedMixedProductMatchingProducts, RelativeSource={RelativeSource AncestorType=Window}}" SelectedItem="{Binding BaseProduct}" MinimumPrefixLength="0" FilterMode="Contains"/>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellEditingTemplate>
+                                        </DataGridTemplateColumn>
+                                        <DataGridTemplateColumn Header="Added Mixable">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <Label Content="{Binding AddedMixable.Name, FallbackValue='Not Found'}" VerticalAlignment="Center" Margin="10, 0"/>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                            <DataGridTemplateColumn.CellEditingTemplate>
+                                                <DataTemplate>
+                                                    <AutoCompleteBox ItemsSource="{Binding ((vm:MainWindowViewModel)DataContext).BindableMixables, RelativeSource={RelativeSource AncestorType=Window}}" SelectedItem="{Binding AddedMixable}" MinimumPrefixLength="0" FilterMode="Contains"/>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellEditingTemplate>
                                         </DataGridTemplateColumn>
                                     </DataGrid.Columns>
                                 </DataGrid>
@@ -415,18 +432,26 @@
                                     <Label Grid.Row="2" Grid.Column="0" Content="Addictiveness:" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5, 5"/>
                                     <NumericUpDown Name="numericUpDown_edit_mixed_addictiveness" Grid.Row="2" Grid.Column="1" Value="0" Minimum="0" Maximum="100" Increment="1" Margin="0, 5"/>
                                     <Label Grid.Row="3" Grid.Column="0" Content="Base Product:" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5, 5"/>
-                                    <AutoCompleteBox Name="autoCompleteBox_edit_mixed_baseProduct" ItemsSource="{Binding BindableProducts}" MinimumPrefixLength="0" FilterMode="Contains" Grid.Row="3" Grid.Column="1" HorizontalAlignment="Stretch" Margin="0, 5"/>
-                                    <Button Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Content="Add new Mixed Product" HorizontalAlignment="Center" Margin="0, 5" Click="Button_edit_mixed_add_OnClick"/>
+                                    <ComboBox Name="comboBox_edit_mixed_baseProduct" ItemsSource="{Binding BindableBaseProducts}" Grid.Row="3" Grid.Column="1" HorizontalAlignment="Stretch" Margin="0, 5">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Name}" />
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+                                    <Button Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Content="Add Mixed Product" HorizontalAlignment="Center" Margin="0, 5" Click="Button_edit_mixed_add_OnClick"/>
                                     <Button Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Content="Delete selected" HorizontalAlignment="Center" Margin="0, 5" Click="Button_edit_mixed_delete_OnClick"/>
                                 </Grid>
                             </HeaderedContentControl>
                             
-                            <HeaderedContentControl Grid.Column="1" Header="Mixables Controls" Margin="5, 0">
-                                <Grid ColumnDefinitions="*, *" RowDefinitions="Auto, Auto, Auto" Margin="5">
-                                    <Label Grid.Column="0" Content="Mixable:" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5, 5"/>
-                                    <AutoCompleteBox Name="autoCompleteBox_edit_ingredients_mixable" ItemsSource="{Binding EditSelectedMixedProductMixablesReverse}" MinimumPrefixLength="0" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" Margin="0, 5"/>
-                                    <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Content="Add new Mixable to Product" HorizontalAlignment="Center" Margin="0, 5" Click="Button_edit_ingredients_add_OnClick"/>
-                                    <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Content="Delete selected" HorizontalAlignment="Center" Margin="0, 5" Click="Button_edit_ingredients_delete_OnClick"/>
+                            <HeaderedContentControl Grid.Column="1" Header="Recipes Controls" Margin="5, 0">
+                                <Grid ColumnDefinitions="*, *" RowDefinitions="Auto, Auto, Auto, Auto" Margin="5">
+                                    <Label Grid.Column="0" Content="Product:" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5, 5"/>
+                                    <AutoCompleteBox Name="autoCompleteBox_edit_mixed_recipe_product" ItemsSource="{Binding EditSelectedMixedProductMatchingProducts}" MinimumPrefixLength="0" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" Margin="0, 5"/>
+                                    <Label Grid.Row="1" Grid.Column="0" Content="Mixable:" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5, 5"/>
+                                    <AutoCompleteBox Name="autoCompleteBox_edit_mixed_recipe_mixable" ItemsSource="{Binding BindableMixables}" MinimumPrefixLength="0" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" Margin="0, 5"/>
+                                    <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Content="Add Recipe to Product" HorizontalAlignment="Center" Margin="0, 5" Click="Button_edit_mixed_recipe_add_OnClick"/>
+                                    <Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Content="Delete selected" HorizontalAlignment="Center" Margin="0, 5" Click="Button_edit_mixed_recipe_delete_OnClick"/>
                                 </Grid>
                             </HeaderedContentControl>
                             
@@ -435,7 +460,7 @@
                                     <Grid ColumnDefinitions="*, *" RowDefinitions="Auto, Auto, Auto" Margin="5">
                                         <Label Grid.Column="0" Content="Effect:" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5, 5"/>
                                         <AutoCompleteBox Name="autoCompleteBox_edit_mixed_effects" ItemsSource="{Binding EditSelectedMixedProducteffectsReverse}" MinimumPrefixLength="0" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" Margin="0, 5"/>
-                                        <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Content="Add new Effect to Product" HorizontalAlignment="Center" Margin="0, 5" Click="Button_edit_mixed_effect_add_OnClick"/>
+                                        <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Content="Add Effect to Product" HorizontalAlignment="Center" Margin="0, 5" Click="Button_edit_mixed_effect_add_OnClick"/>
                                         <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Content="Delete selected" HorizontalAlignment="Center" Margin="0, 5" Click="Button_edit_mixed_effect_delete_OnClick"/>
                                     </Grid>
                                 </HeaderedContentControl>

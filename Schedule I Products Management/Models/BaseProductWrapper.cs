@@ -8,7 +8,7 @@ using Schedule_I_Products_Management.Views;
 
 namespace Schedule_I_Products_Management.Models;
 
-public class BaseProductWrapper : ReactiveObject, IProductWrapperShowData
+public class BaseProductWrapper : ReactiveObject, IProductWrapper
 {
     private BaseProduct _baseProduct;
     
@@ -26,17 +26,16 @@ public class BaseProductWrapper : ReactiveObject, IProductWrapperShowData
 
     public bool IsMixed => false;
     public int Profit => _profit.Value;
-    public ReadOnlyObservableCollection<MixableWrapper> Mixables => new([]);
-    public ReadOnlyObservableCollection<ProductEffectWrapper> Effects => new(ProductEffect.Name.Equals("None") ? [] : [ProductEffect]);
+    public ReadOnlyObservableCollection<ProductEffectWrapper> Effects => new(ProductEffect == null ? [] : [ProductEffect]);
+    public ReadOnlyObservableCollection<ProductRecipeWrapper> Recipes => new([]);
     public Guid Id => _baseProduct.Id;
 
-    public ProductEffectWrapper ProductEffect
+    public ProductEffectWrapper? ProductEffect
     {
-        get => MainWindow.ViewModel.ProductEffects.Items.FirstOrDefault(mix => mix.Id == _baseProduct.EffectId,
-            new ProductEffectWrapper(new ProductEffect { Name = "None" }));
+        get => MainWindow.ViewModel.ProductEffects.Items.FirstOrDefault(mix => mix.Id == _baseProduct.EffectId);
         set
         {
-            _baseProduct.EffectId = value.Id;
+            _baseProduct.EffectId = value?.Id;
             this.RaisePropertyChanged();
         }
     }

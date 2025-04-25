@@ -6,6 +6,7 @@ using System.Reactive;
 using System.Reactive.Linq;
 using AvaloniaGraphControl;
 using DynamicData;
+using DynamicData.Alias;
 using ReactiveUI;
 using Schedule_I_Products_Management.Models;
 
@@ -31,12 +32,11 @@ public class MainWindowViewModel : ViewModelBase
     private ReadOnlyObservableCollection<MixedProductWrapper> _readOnlyMixedProducts;
     private ReadOnlyObservableCollection<MixableWrapper> _readOnlyMixables;
     private ReadOnlyObservableCollection<ProductEffectWrapper> _readOnlyProductEffects;
-    private ReadOnlyObservableCollection<IProductWrapperShowData> _readOnlyProducts;
-    private ReadOnlyObservableCollection<MixableWrapper> _editSelectedMixables;
-    private ReadOnlyObservableCollection<MixableWrapper> _editSelectedMixablesReverse;
+    private ReadOnlyObservableCollection<IProductWrapper> _readOnlyProducts;
     private ReadOnlyObservableCollection<ProductEffectWrapper> _editSelectedEffects;
     private ReadOnlyObservableCollection<ProductEffectWrapper> _editSelectedEffectsReverse;
-    private ReadOnlyObservableCollection<IProductWrapperShowData> _overviewFilteredProducts;
+    private ReadOnlyObservableCollection<IProductWrapper> _overviewFilteredProducts;
+    private ReadOnlyObservableCollection<IProductWrapper> _selectedMixedMatchingProducts;
     private BaseProductWrapper _missingSelectedBaseProduct;
 
     public ref SourceList<BaseProductWrapper> BaseProducts => ref _baseProducts;
@@ -48,12 +48,11 @@ public class MainWindowViewModel : ViewModelBase
     public ReadOnlyObservableCollection<MixedProductWrapper> BindableMixedProducts => _readOnlyMixedProducts;
     public ReadOnlyObservableCollection<MixableWrapper> BindableMixables => _readOnlyMixables;
     public ReadOnlyObservableCollection<ProductEffectWrapper> BindableProductEffects => _readOnlyProductEffects;
-    public ReadOnlyObservableCollection<IProductWrapperShowData> BindableProducts => _readOnlyProducts;
-    public ReadOnlyObservableCollection<MixableWrapper> EditSelectedMixedProductMixables => _editSelectedMixables;
-    public ReadOnlyObservableCollection<MixableWrapper> EditSelectedMixedProductMixablesReverse => _editSelectedMixablesReverse;
+    public ReadOnlyObservableCollection<IProductWrapper> BindableProducts => _readOnlyProducts;
     public ReadOnlyObservableCollection<ProductEffectWrapper> EditSelectedMixedProductEffects => _editSelectedEffects;
     public ReadOnlyObservableCollection<ProductEffectWrapper> EditSelectedMixedProducteffectsReverse => _editSelectedEffectsReverse;
-    public ReadOnlyObservableCollection<IProductWrapperShowData> OverviewFilteredProducts => _overviewFilteredProducts;
+    public ReadOnlyObservableCollection<IProductWrapper> OverviewFilteredProducts => _overviewFilteredProducts;
+    public ReadOnlyObservableCollection<IProductWrapper> EditSelectedMixedProductMatchingProducts => _selectedMixedMatchingProducts;
 
     public MainWindowViewModel()
     {
@@ -85,42 +84,6 @@ public class MainWindowViewModel : ViewModelBase
         _productEffects.Connect()
             .ObserveOn(RxApp.MainThreadScheduler)
             .Bind(out _readOnlyProductEffects)
-            .Subscribe();
-
-        // EditSelectedMixedProductMixables
-        this.WhenAnyValue(x => x.EditSelectedMixedProduct)
-            .Select(mpw =>
-            {
-                if (mpw == null) return Observable.Empty<IChangeSet<MixableWrapper>>();
-
-                return mpw.MixablesIds.Connect()
-                    .Transform(id => _mixables.Items.FirstOrDefault(m => m.Id == id))
-                    .Filter(m => m != null);
-            })
-            .Switch()
-            .ObserveOn(RxApp.MainThreadScheduler)
-            .Bind(out _editSelectedMixables)
-            .Subscribe();
-
-        // EditSelectedMixedProductMixablesReverse
-        this.WhenAnyValue(x => x.EditSelectedMixedProduct)
-            .Select(mpw =>
-            {
-                if (mpw == null)
-                    return Observable.Empty<IChangeSet<MixableWrapper>>();
-
-                var trigger = mpw.MixablesIds.Connect()
-                    .ToCollection()
-                    .Select(_ => Unit.Default);
-
-                return _mixables.Connect()
-                    .AutoRefresh()
-                    .AutoRefreshOnObservable(_ => trigger)
-                    .Filter(m => !mpw.MixablesIds.Items.Contains(m.Id));
-            })
-            .Switch()
-            .ObserveOn(RxApp.MainThreadScheduler)
-            .Bind(out _editSelectedMixablesReverse)
             .Subscribe();
         
         // EditSelectedMixedProductEffects
@@ -158,14 +121,39 @@ public class MainWindowViewModel : ViewModelBase
             .ObserveOn(RxApp.MainThreadScheduler)
             .Bind(out _editSelectedEffectsReverse)
             .Subscribe();
+        
+        // EditSelectedMixedProductMatchingProducts
+        this.WhenAnyValue(x => x.EditSelectedMixedProduct)
+            .Select(mpw =>
+            {
+                if(mpw == null)
+                    return Observable.Empty<IChangeSet<IProductWrapper>>();
+                
+                var trigger = mpw.RecipesSourceList.Connect()
+                    .ToCollection()
+                    .Select(_ => Unit.Default);
+                
+                return _mixedProducts.Connect()
+                    .AutoRefresh()
+                    .AutoRefreshOnObservable(_ => trigger)
+                    .Where(m => m.Id != mpw.Id
+                                && (m.BaseProduct?.Id ?? Guid.Empty) == (mpw.BaseProduct?.Id ?? Guid.Empty)
+                                && !mpw.Recipes.Select(r => r.BaseProduct?.Id ?? Guid.Empty).Contains(m.Id))
+                    .Transform(IProductWrapper (m) => m)
+                    .MergeChangeSets(_baseProducts.Connect()
+                        .Filter(bp => bp.Id == mpw.BaseProduct.Id)
+                        .Transform(IProductWrapper (bp) => bp));
+            })
+            .Switch()
+            .ObserveOn(RxApp.MainThreadScheduler)
+            .Bind(out _selectedMixedMatchingProducts)
+            .Subscribe();
 
         // OverviewFilteredProducts
         _baseProducts.Connect()
-            .AutoRefresh()
-            .Transform(IProductWrapperShowData (bp) => bp)
+            .Transform(IProductWrapper (bp) => bp)
             .MergeChangeSets(_mixedProducts.Connect()
-                .AutoRefresh()
-                .Transform(IProductWrapperShowData (mp) => mp))
+                .Transform(IProductWrapper (mp) => mp))
             .ObserveOn(RxApp.MainThreadScheduler)
             .Bind(out _overviewFilteredProducts)
             .Subscribe();
@@ -173,10 +161,10 @@ public class MainWindowViewModel : ViewModelBase
         // BindableProducts
         _baseProducts.Connect()
             .AutoRefresh()
-            .Transform(IProductWrapperShowData (bp) => bp)
+            .Transform(IProductWrapper (bp) => bp)
             .MergeChangeSets(_mixedProducts.Connect()
                 .AutoRefresh()
-                .Transform(IProductWrapperShowData (mp) => mp))
+                .Transform(IProductWrapper (mp) => mp))
             .ObserveOn(RxApp.MainThreadScheduler)
             .Bind(out _readOnlyProducts)
             .Subscribe();
@@ -186,6 +174,7 @@ public class MainWindowViewModel : ViewModelBase
             .Subscribe(_ => UniqueMixedPerBaseProduct = GetUniqueNodeCount());
         
         // MissingGraph
+        /*
         _mixables.Connect()
             .AutoRefresh(x => x.Name)
             .Select(_ => Unit.Default)
@@ -197,6 +186,7 @@ public class MainWindowViewModel : ViewModelBase
                     .Select(_ => Unit.Default))
                 .MergeMany(x => x))
             .Subscribe(_ => MissingGraph = GenerateGraph(lastUsedGraphBaseId, lastUsedGraphMixablesIds, lastUsedGraphStartNode));
+            */
     }
     
     public MixedProductWrapper? EditSelectedMixedProduct
@@ -233,7 +223,7 @@ public class MainWindowViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _uniqueMixedPerBaseProduct, value);
     }
 
-    private Graph GenerateGraph(IProductWrapperShowData? startProduct)
+    private Graph GenerateGraph(IProductWrapper? startProduct)
     {
         if (startProduct == null)
             return new Graph { Orientation = Graph.Orientations.Horizontal};
@@ -243,9 +233,9 @@ public class MainWindowViewModel : ViewModelBase
             ? ((MixedProductWrapper)startProduct).BaseProduct.Id
             : ((BaseProductWrapper)startProduct).Id;
 
-        var startMixableIds = startIsMixed
+        var startMixableIds = new List<Guid>(); /*startIsMixed
             ? ((MixedProductWrapper)startProduct).MixablesIds.Items.ToList()
-            : [];
+            : [];*/
 
         return GenerateGraph(baseProductId, startMixableIds, new ProductNode(startProduct));
     }
@@ -264,10 +254,10 @@ public class MainWindowViewModel : ViewModelBase
         
         if (baseProductId == Guid.Empty || startMixableIds == null || startNode == null)
             return graph;
-
+        /*
         var foundRelatedMixed = _mixedProducts.Items
             .Where(x => x.BaseProduct.Id == baseProductId && startMixableIds.All(x.MixablesIds.Items.Contains))
-            .Select(IProductWrapperShowData (p) => p)
+            .Select(IProductWrapper (p) => p)
             .ToList();
         foundRelatedMixed.Add(_baseProducts.Items.First(p => p.Id == baseProductId));
 
@@ -319,7 +309,7 @@ public class MainWindowViewModel : ViewModelBase
             }
         }
 
-        MissingMixables = _mixables.Items.Where(m => startMixableIds.Contains(m.Id)).ToList();
+        MissingMixables = _mixables.Items.Where(m => startMixableIds.Contains(m.Id)).ToList();*/
         return graph;
     }
     
