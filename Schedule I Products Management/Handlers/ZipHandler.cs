@@ -3,7 +3,7 @@ using System.IO;
 using System.IO.Compression;
 using Newtonsoft.Json;
 
-namespace Schedule_I_Products_Management;
+namespace Schedule_I_Products_Management.Handlers;
 
 public static class ZipHandler
 {

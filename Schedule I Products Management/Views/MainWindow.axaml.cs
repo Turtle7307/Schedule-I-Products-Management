@@ -5,6 +5,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using DynamicData;
 using Schedule_I_Products_Management.Data;
+using Schedule_I_Products_Management.Handlers;
 using Schedule_I_Products_Management.Models;
 using Schedule_I_Products_Management.ViewModels;
 
