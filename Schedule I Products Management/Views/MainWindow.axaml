@@ -267,59 +267,6 @@
                         </Grid>
                     </HeaderedContentControl>
                     
-                    <!-- Mixable -->
-                    <HeaderedContentControl Grid.Column="1" Header="Mixables" Margin="5">
-                        <Grid ColumnDefinitions="*, *">
-                            <Border BorderThickness="1" CornerRadius="4" BorderBrush="{DynamicResource BorderCardBorderBrush}">
-                                <DataGrid Name="dataGrid_edit_mixable" ItemsSource="{Binding BindableMixables}" IsReadOnly="False">
-                                    <DataGrid.Columns>
-                                        <DataGridTextColumn Header="Name" Binding="{Binding Name}" IsReadOnly="False"/>
-                                        <DataGridTemplateColumn Header="Cost" SortMemberPath="Cost">
-                                            <DataGridTemplateColumn.CellTemplate>
-                                                <DataTemplate>
-                                                    <Label Content="{Binding Cost, StringFormat='{}{0}$'}" VerticalAlignment="Center" Margin="10, 0"/>
-                                                </DataTemplate>
-                                            </DataGridTemplateColumn.CellTemplate>
-                                            <DataGridTemplateColumn.CellEditingTemplate>
-                                                <DataTemplate>
-                                                    <NumericUpDown Value="{Binding Cost}" Minimum="0" Increment="1" HorizontalAlignment="Stretch"/>
-                                                </DataTemplate>
-                                            </DataGridTemplateColumn.CellEditingTemplate>
-                                        </DataGridTemplateColumn>
-                                    </DataGrid.Columns>
-                                </DataGrid>
-                            </Border>
-                            
-                            <Grid Grid.Column="1" ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto, Auto, Auto" Margin="5">
-                                <Label Content="Name:" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5, 5"/>
-                                <TextBox Name="textBox_edit_mixable_name" Grid.Row="0" Grid.Column="1" Margin="0, 5"/>
-                                <Label Grid.Row="1" Grid.Column="0" Content="Price:" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5, 5"/>
-                                <NumericUpDown Name="numericUpDown_edit_mixable_price" Grid.Row="1" Grid.Column="1" Minimum="0" Increment="1" Value="3" Margin="0, 5"/>
-                                <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Content="Add Mixable" HorizontalAlignment="Center" Margin="0, 5" Click="Button_edit_mixable_add_OnClick"/>
-                                <Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Content="Delete selected" HorizontalAlignment="Center" Margin="0, 5" Click="Button_edit_mixable_delete_OnClick"/>
-                            </Grid>
-                        </Grid>
-                    </HeaderedContentControl>
-                    
-                    <!-- Effects -->
-                    <HeaderedContentControl Grid.Column="2" Header="Effects" Margin="5">
-                        <Grid ColumnDefinitions="*, *">
-                            <Border BorderThickness="1" CornerRadius="4" BorderBrush="{DynamicResource BorderCardBorderBrush}">
-                                <DataGrid Name="dataGrid_edit_effect" ItemsSource="{Binding BindableProductEffects}" IsReadOnly="False">
-                                    <DataGrid.Columns>
-                                        <DataGridTextColumn Header="Name" Binding="{Binding Name}" IsReadOnly="False"/>
-                                    </DataGrid.Columns>
-                                </DataGrid>
-                            </Border>
-                            
-                            <Grid Grid.Column="1" ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto, Auto" Margin="5">
-                                <Label Content="Name:" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5, 5"/>
-                                <TextBox Name="textBox_edit_effect_name" Grid.Row="0" Grid.Column="1" Margin="0, 5"/>
-                                <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Content="Add Effect" HorizontalAlignment="Center" Margin="0, 5" Click="Button_edit_effect_add_OnClick"/>
-                                <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Content="Delete selected" HorizontalAlignment="Center" Margin="0, 5" Click="Button_edit_effect_delete_OnClick"/>
-                            </Grid>
-                        </Grid>
-                    </HeaderedContentControl>
                 </Grid>
                 
                 <!-- Bottom -->
@@ -467,6 +414,66 @@
                             
                                 <Button Grid.Row="1" Content="Save Data" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Margin="5, 10, 5, 0" Classes="Success" Click="Button_save_OnClick"/>
                             </Grid>
+                        </Grid>
+                    </Grid>
+                </HeaderedContentControl>
+            </Grid>
+        </TabItem>
+        
+        <!-- General Options for stuff -->
+        <TabItem Header="Global Options">
+            <Grid ColumnDefinitions="*, *">
+                
+                <!-- Mixable -->
+                <HeaderedContentControl Header="Mixables" Margin="5">
+                    <Grid ColumnDefinitions="*, *">
+                        <Border BorderThickness="1" CornerRadius="4" BorderBrush="{DynamicResource BorderCardBorderBrush}">
+                            <DataGrid Name="dataGrid_edit_mixable" ItemsSource="{Binding BindableMixables}" IsReadOnly="False">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Name" Binding="{Binding Name}" IsReadOnly="False"/>
+                                    <DataGridTemplateColumn Header="Cost" SortMemberPath="Cost">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Label Content="{Binding Cost, StringFormat='{}{0}$'}" VerticalAlignment="Center" Margin="10, 0"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                        <DataGridTemplateColumn.CellEditingTemplate>
+                                            <DataTemplate>
+                                                <NumericUpDown Value="{Binding Cost}" Minimum="0" Increment="1" HorizontalAlignment="Stretch"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellEditingTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Border>
+                        
+                        <Grid Grid.Column="1" ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto, Auto, Auto" Margin="5">
+                            <Label Content="Name:" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5, 5"/>
+                            <TextBox Name="textBox_edit_mixable_name" Grid.Row="0" Grid.Column="1" Margin="0, 5"/>
+                            <Label Grid.Row="1" Grid.Column="0" Content="Price:" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5, 5"/>
+                            <NumericUpDown Name="numericUpDown_edit_mixable_price" Grid.Row="1" Grid.Column="1" Minimum="0" Increment="1" Value="3" Margin="0, 5"/>
+                            <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Content="Add Mixable" HorizontalAlignment="Center" Margin="0, 5" Click="Button_edit_mixable_add_OnClick"/>
+                            <Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Content="Delete selected" HorizontalAlignment="Center" Margin="0, 5" Click="Button_edit_mixable_delete_OnClick"/>
+                        </Grid>
+                    </Grid>
+                </HeaderedContentControl>
+                
+                <!-- Effects -->
+                <HeaderedContentControl Grid.Column="1" Header="Effects" Margin="5">
+                    <Grid ColumnDefinitions="*, *">
+                        <Border BorderThickness="1" CornerRadius="4" BorderBrush="{DynamicResource BorderCardBorderBrush}">
+                            <DataGrid Name="dataGrid_edit_effect" ItemsSource="{Binding BindableProductEffects}" IsReadOnly="False">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Name" Binding="{Binding Name}" IsReadOnly="False"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Border>
+                            
+                        <Grid Grid.Column="1" ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto, Auto" Margin="5">
+                            <Label Content="Name:" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5, 5"/>
+                            <TextBox Name="textBox_edit_effect_name" Grid.Row="0" Grid.Column="1" Margin="0, 5"/>
+                            <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Content="Add Effect" HorizontalAlignment="Center" Margin="0, 5" Click="Button_edit_effect_add_OnClick"/>
+                            <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Content="Delete selected" HorizontalAlignment="Center" Margin="0, 5" Click="Button_edit_effect_delete_OnClick"/>
                         </Grid>
                     </Grid>
                 </HeaderedContentControl>

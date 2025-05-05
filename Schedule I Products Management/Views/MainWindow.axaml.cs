@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using System.Linq;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
@@ -13,13 +12,8 @@ namespace Schedule_I_Products_Management.Views;
 
 public partial class MainWindow : Window
 {
-    private const string DataZipFile = "data.zip";
-    private const string BaseProductsJsonFile = "baseProducts.json";
-    private const string MixablesJsonFile = "mixables.json";
-    private const string MixedProductsJsonFile = "mixedProducts.json";
-    private const string ProductEffectsJsonFile = "productEffects.json";
-    
-    public static MainWindowViewModel ViewModel { get; private set; }
+    public static ref MainWindowViewModel ViewModel => ref _viewModel;
+    private static MainWindowViewModel _viewModel;
 
     public MainWindow()
     {
@@ -28,37 +22,13 @@ public partial class MainWindow : Window
 
     protected override void OnLoaded(RoutedEventArgs e)
     {
-        ViewModel = (MainWindowViewModel) DataContext;
-        if (!File.Exists(DataZipFile)) return;
-
-        ViewModel.ProductEffects.Edit(list =>
-            list.AddRange(
-                ZipHandler.ReadJsonFromZip<ProductEffect[]>(DataZipFile, ProductEffectsJsonFile)!
-                    .Select(x => new ProductEffectWrapper(x))));
-        ViewModel.Mixables.Edit(list =>
-            list.AddRange(
-                ZipHandler.ReadJsonFromZip<Mixable[]>(DataZipFile, MixablesJsonFile)!
-                    .Select(x => new MixableWrapper(x))));
-        ViewModel.BaseProducts.Edit(list =>
-            list.AddRange(
-                ZipHandler.ReadJsonFromZip<BaseProduct[]>(DataZipFile, BaseProductsJsonFile)!.
-                    Select(x => new BaseProductWrapper(x))));
-        ViewModel.MixedProducts.Edit(list =>
-            list.AddRange(
-                ZipHandler.ReadJsonFromZip<MixedProduct[]>(DataZipFile, MixedProductsJsonFile)!
-                    .Select(x => new MixedProductWrapper(x))));
+        _viewModel = (MainWindowViewModel) DataContext;
+        DataHandler.ReadData(ref _viewModel);
     }
     
     private void Button_save_OnClick(object? sender, RoutedEventArgs e)
     {
-        ZipHandler.WriteJsonToZip(ViewModel.ProductEffects.Items.Select(ProductEffect (x) => x).ToArray(), DataZipFile,
-            ProductEffectsJsonFile);
-        ZipHandler.WriteJsonToZip(ViewModel.Mixables.Items.Select(Mixable (x) => x).ToArray(), DataZipFile,
-            MixablesJsonFile);
-        ZipHandler.WriteJsonToZip(ViewModel.BaseProducts.Items.Select(BaseProduct (x) => x).ToArray(), DataZipFile,
-            BaseProductsJsonFile);
-        ZipHandler.WriteJsonToZip(ViewModel.MixedProducts.Items.Select(MixedProduct (x) => x).ToArray(), DataZipFile,
-            MixedProductsJsonFile);
+        DataHandler.WriteData(ref _viewModel);
     }
 
     private void Button_edit_buyable_add_OnClick(object? sender, RoutedEventArgs e)
